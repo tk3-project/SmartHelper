@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">demo</string>
+    <string name="title">SmartHelper</string>
+    <string name="footer">TK3@group15</string>
+    <string name="tab_text_1">Settings</string>
+    <string name="tab_text_2">Context</string>
+
+    <string name="tab_1_title">Followings are the services we support. Please personalize yourself.</string>
+    <string name="tab_1_list_1">Music Assistant</string>
+    <string name="tab_1_list_2">Warning Assistant</string>
+    <string name="tab_1_list_3">Home Assistant</string>
+    <string name="tab_1_list_1_des">When you are running in a park with headphone plugged in, this service will automatically play music for you.</string>
+    <string name="tab_1_list_2_des">When you are walking near a market, this service will remind you to wear a mask.</string>
+    <string name="tab_1_list_3_des">When you are at home in late evening without using your phone, this service will automatically switch it to dark mode.</string>
+
+    <string name="tab_2_title">Followings are the detected user activity and location contexts.</string>
+    <string name="tab_2_activity">Detected Activity</string>
+    <string name="tab_2_location">Detected Location</string>
+
+    <string name="activity_in_vehicle">In Vehicle</string>
+    <string name="activity_on_bicycle">On Bicycle</string>
+    <string name="activity_on_foot">On Foot</string>
+    <string name="activity_running">Running</string>
+    <string name="activity_still">Still</string>
+    <string name="activity_tilting">Tilting</string>
+    <string name="activity_walking">walking</string>
+    <string name="activity_unknown">Unknown</string>
+
+    <string name="required_permissions_title">Permissions Needed</string>
+    <string name="required_permissions_message">To process your context correctly this app needs permission to access your location and activity data. Please grant the permissions for this app to work properly.</string>
+    <string name="required_permissions_cancel">Cancel</string>
+    <string name="required_permissions_confirm">Grant Access</string>
+    <string name="permission_dialog_canceled">The scenario could not be activated due to insufficient permissions.</string>
+</resources>
