@@ -4,13 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,7 +19,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.g15.smarthelper.R;
 import com.g15.smarthelper.Constants;
-import com.g15.smarthelper.Services.DetectedActivitiesService;
 import com.google.android.gms.location.DetectedActivity;
 
 
@@ -32,7 +29,7 @@ public class DisplayFragment extends Fragment {
 
     private TextView txtActivity, txtLocation;
     private ImageView imgActivity;
-    private Button btnStartTracking, btnStopTracking;
+    //private Button btnStartTracking, btnStopTracking;
 
     @Override
     public View onCreateView(
@@ -48,15 +45,15 @@ public class DisplayFragment extends Fragment {
         txtActivity = getActivity().findViewById(R.id.txt_activity);
         txtLocation = getActivity().findViewById(R.id.txt_location);
         imgActivity = getActivity().findViewById(R.id.img_activity);
-        btnStartTracking = getActivity().findViewById(R.id.btn_start_tracking);
-        btnStopTracking = getActivity().findViewById(R.id.btn_stop_tracking);
+        //btnStartTracking = getActivity().findViewById(R.id.btn_start_tracking);
+        //btnStopTracking = getActivity().findViewById(R.id.btn_stop_tracking);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        btnStartTracking.setOnClickListener(new View.OnClickListener() {
+        /*btnStartTracking.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startTracking();
@@ -68,7 +65,7 @@ public class DisplayFragment extends Fragment {
             public void onClick(View view) {
                 stopTracking();
             }
-        });
+        });*/
 
         broadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -81,7 +78,6 @@ public class DisplayFragment extends Fragment {
                 }
             }
         };
-        startTracking();
     }
 
     private void handleUserActivity(int type, int confidence) {
@@ -151,16 +147,5 @@ public class DisplayFragment extends Fragment {
         super.onPause();
 
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
-    }
-
-    private void startTracking() {
-        Intent intent = new Intent(getActivity(), DetectedActivitiesService.class);
-        getContext().startService(intent);
-        //Log.i(LOG_TAG, "Start Tracking");
-    }
-    private void stopTracking() {
-        Intent intent = new Intent(getActivity(), DetectedActivitiesService.class);
-        getContext().stopService(intent);
-        //Log.i(LOG_TAG, "Stop Tracking");
     }
 }

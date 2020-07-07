@@ -3,10 +3,12 @@ package com.g15.smarthelper.ui.main;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +20,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
 
 import com.g15.smarthelper.R;
 import com.g15.smarthelper.Scenarios;
+import com.g15.smarthelper.Services.DetectedActivitiesService;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -28,6 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.g15.smarthelper.Scenarios.SHARED_PREFERENCES_KEY;
+import com.g15.smarthelper.ui.main.DisplayFragment;
 
 
 public class SettingFragment extends Fragment implements CompoundButton.OnCheckedChangeListener {
@@ -218,11 +224,13 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         }
 
         setScenarioEnabled(currentScenario, scenarioActivated);
+        Log.i(LOG_TAG, "test");
 
         if (!scenarios.isAnyScenarioEnabled()) {
             // No scenario enabled. Disable location and activity tracking.
             disableLocationAndActivityTracking();
         } else if (!activatedBefore) {
+            Log.i(LOG_TAG, "tracking enabled");
             // The first scenario has been activated. Enable location and activity tracking.
             enableLocationAndActivityTracking();
         }
@@ -232,14 +240,19 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
      * Enable and initialize the tracking of location and activity of the user.
      */
     private void enableLocationAndActivityTracking() {
-        // TODO
+
+        Intent intent = new Intent(getActivity(), DetectedActivitiesService.class);
+        getContext().startService(intent);
+        Log.i(LOG_TAG, "Start Tracking");
     }
 
     /**
      * Disable the tracking of location and activity of the user.
      */
     private void disableLocationAndActivityTracking() {
-        // TODO
+        Intent intent = new Intent(getActivity(), DetectedActivitiesService.class);
+        getContext().stopService(intent);
+        Log.i(LOG_TAG, "Stop Tracking");
     }
 
     /**

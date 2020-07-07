@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">demo</string>
+    <string name="app_name">SmartHelper</string>
     <string name="title">SmartHelper</string>
     <string name="footer">TK3@group15</string>
     <string name="tab_text_1">Settings</string>

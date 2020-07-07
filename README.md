@@ -1,6 +1,9 @@
 # SmartHelper
 
 ## ChangeLog
+* Add `enableLocationAndActivityTracking` and `disableLocationAndActivityTracking` methods in SettingFragment
+
+
 * Add new Services
 * Rename some files
 * Change the structure of the project
