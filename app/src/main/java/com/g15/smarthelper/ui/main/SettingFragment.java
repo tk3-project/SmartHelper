@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -23,6 +24,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 
+import com.g15.smarthelper.MainActivity;
 import com.g15.smarthelper.R;
 import com.g15.smarthelper.Scenarios;
 import com.g15.smarthelper.Services.DetectedActivitiesService;
@@ -72,6 +74,25 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         musicSwitch.setOnCheckedChangeListener(this);
         warningSwitch.setOnCheckedChangeListener(this);
         homeSwitch.setOnCheckedChangeListener(this);
+
+        setInitialLocation();
+    }
+
+    private void setInitialLocation() {
+        double herrnGartenLat = 49.8775;
+        double herrnGartenLng = 8.6525;
+        int herrnGartenRadius = 150; // in meters
+        scenarios.setScenarioFence(Scenarios.Scenario.SCENARIO_MUSIC, herrnGartenLat, herrnGartenLng, herrnGartenRadius);
+
+        double homeLat = 49.8727;
+        double homeLng = 8.6312;
+        int homeRadius = 50; // in meters
+        scenarios.setScenarioFence(Scenarios.Scenario.SCENARIO_HOME, homeLat, homeLng, homeRadius);
+
+        double warningLat = 49.8521;
+        double warningLng = 8.6463;
+        int warningRadius = 50; // in meters
+        scenarios.setScenarioFence(Scenarios.Scenario.SCENARIO_WARNING, warningLat, warningLng, warningRadius);
     }
 
     /**
@@ -224,13 +245,11 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         }
 
         setScenarioEnabled(currentScenario, scenarioActivated);
-        Log.i(LOG_TAG, "test");
 
         if (!scenarios.isAnyScenarioEnabled()) {
             // No scenario enabled. Disable location and activity tracking.
             disableLocationAndActivityTracking();
         } else if (!activatedBefore) {
-            Log.i(LOG_TAG, "tracking enabled");
             // The first scenario has been activated. Enable location and activity tracking.
             enableLocationAndActivityTracking();
         }
@@ -240,19 +259,20 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
      * Enable and initialize the tracking of location and activity of the user.
      */
     private void enableLocationAndActivityTracking() {
-
+        Log.i(LOG_TAG, "Start activity and location tracking.");
         Intent intent = new Intent(getActivity(), DetectedActivitiesService.class);
+        ((MainActivity) getActivity()).requestLocationUpdates();
         getContext().startService(intent);
-        Log.i(LOG_TAG, "Start Tracking");
     }
 
     /**
      * Disable the tracking of location and activity of the user.
      */
     private void disableLocationAndActivityTracking() {
+        Log.i(LOG_TAG, "Stop activity and location tracking.");
         Intent intent = new Intent(getActivity(), DetectedActivitiesService.class);
         getContext().stopService(intent);
-        Log.i(LOG_TAG, "Stop Tracking");
+        ((MainActivity) getActivity()).removeLocationUpdates();
     }
 
     /**

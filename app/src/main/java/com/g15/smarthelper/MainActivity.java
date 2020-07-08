@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         mAddressRequested = true;
 
         createLocationRequest();
-        requestLocationUpdates();
+        //requestLocationUpdates();
     }
 
     public void requestLocationUpdates() {
