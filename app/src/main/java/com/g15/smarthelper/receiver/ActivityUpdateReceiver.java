@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 
+import com.g15.smarthelper.ScenarioHandler.ScenarioHandler;
+import com.g15.smarthelper.ScenarioHandler.ScenarioSelector;
 import com.g15.smarthelper.Scenarios;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
@@ -35,7 +37,7 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
                             SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
                     Scenarios scenarios = new Scenarios(sharedPreferences);
 
-                    processActivityUpdate(scenarios, activity.getType());
+                    processActivityUpdate(context, scenarios, activity.getType());
                 } else {
                     Log.i(LOG_TAG, "Received activity change " + activity + " with confidence "
                             + confidence + " smaller than threshold " + CONFIDENCE + ".");
@@ -44,7 +46,7 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
         }
     }
 
-    private void processActivityUpdate(Scenarios scenarios, int activityType) {
+    private void processActivityUpdate(Context context, Scenarios scenarios, int activityType) {
         Scenarios.Scenario[] availableScenarios = Scenarios.Scenario.values();
         for (Scenarios.Scenario scenario : availableScenarios) {
             boolean isLocationTriggered = scenarios.getScenarioTriggered(scenario);
@@ -57,7 +59,9 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
 
                 if (isLocationTriggered && targetActivity == activityType) {
                     Log.i(LOG_TAG, "Scenario " + scenario + " was triggered by activity " + activityType);
-                    // TODO: Trigger scenario handler
+                    // Trigger scenario handler
+                    ScenarioHandler handler = ScenarioSelector.getScenarioHandler(scenario);
+                    handler.handleScenario(context);
                 }
             }
         }

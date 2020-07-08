@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.util.Log;
 
+import com.g15.smarthelper.ScenarioHandler.ScenarioHandler;
+import com.g15.smarthelper.ScenarioHandler.ScenarioSelector;
 import com.g15.smarthelper.Scenarios;
 import com.google.android.gms.location.LocationResult;
 
@@ -31,13 +33,13 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
                         SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
                 Scenarios scenarios = new Scenarios(sharedPreferences);
                 for (Location location : locations) {
-                    processLocationUpdate(scenarios, location);
+                    processLocationUpdate(context, scenarios, location);
                 }
             }
         }
     }
 
-    private void processLocationUpdate(Scenarios scenarios, Location location) {
+    private void processLocationUpdate(Context context, Scenarios scenarios, Location location) {
         Scenarios.Scenario[] availableScenarios = Scenarios.Scenario.values();
         for (Scenarios.Scenario scenario : availableScenarios) {
             boolean wasTriggeringBefore = scenarios.getScenarioTriggered(scenario);
@@ -53,7 +55,9 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
 
             if (!wasTriggeringBefore && isInFence && targetActivity == currentActivity) {
                 Log.i(LOG_TAG, "Scenario " + scenario + " was triggered at location: " + location);
-                // TODO: Trigger scenario handler
+                // Trigger scenario handler
+                ScenarioHandler handler = ScenarioSelector.getScenarioHandler(scenario);
+                handler.handleScenario(context);
             } else if (wasTriggeringBefore && !isInFence) {
                 Log.i(LOG_TAG, "Scenario " + scenario + " was left.");
             }
