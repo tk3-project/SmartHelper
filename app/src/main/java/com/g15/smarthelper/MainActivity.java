@@ -9,8 +9,11 @@ import android.location.Location;
 import android.os.Bundle;
 
 import com.g15.smarthelper.Services.FetchAddressIntentService;
+import com.g15.smarthelper.receiver.ActivityUpdateReceiver;
 import com.g15.smarthelper.receiver.LocationUpdateReceiver;
 import com.g15.smarthelper.ui.main.SectionsPagerAdapter;
+import com.google.android.gms.location.ActivityRecognition;
+import com.google.android.gms.location.ActivityRecognitionClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -30,6 +33,8 @@ import android.os.ResultReceiver;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import static com.g15.smarthelper.Constants.DETECTION_INTERVAL_IN_MILLISECONDS;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -125,6 +130,22 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, LocationUpdateReceiver.class);
         return PendingIntent.getBroadcast(
                 this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    public void requestActivityUpdates() {
+        ActivityRecognitionClient client = ActivityRecognition.getClient(this);
+        client.requestActivityUpdates(DETECTION_INTERVAL_IN_MILLISECONDS, getActivityPendingIntent());
+    }
+
+    public void removeActivityUpdates() {
+        ActivityRecognitionClient client = ActivityRecognition.getClient(this);
+        client.removeActivityUpdates(getActivityPendingIntent());
+    }
+
+    private PendingIntent getActivityPendingIntent() {
+        Intent intent = new Intent(this, ActivityUpdateReceiver.class);
+        return PendingIntent.getBroadcast(
+                this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     @Override

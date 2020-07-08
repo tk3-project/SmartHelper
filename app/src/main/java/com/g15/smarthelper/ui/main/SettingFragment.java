@@ -261,8 +261,9 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
     private void enableLocationAndActivityTracking() {
         Log.i(LOG_TAG, "Start activity and location tracking.");
         Intent intent = new Intent(getActivity(), DetectedActivitiesService.class);
-        ((MainActivity) getActivity()).requestLocationUpdates();
         getContext().startService(intent);
+        ((MainActivity) getActivity()).requestLocationUpdates();
+        ((MainActivity) getActivity()).requestActivityUpdates();
     }
 
     /**
@@ -273,6 +274,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         Intent intent = new Intent(getActivity(), DetectedActivitiesService.class);
         getContext().stopService(intent);
         ((MainActivity) getActivity()).removeLocationUpdates();
+        ((MainActivity) getActivity()).removeActivityUpdates();
     }
 
     /**

@@ -4,6 +4,8 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.util.Log;
 
+import com.google.android.gms.location.DetectedActivity;
+
 /**
  * This class allows access to the activation state of the scenarios.
  * The activation states of the scenarios are stored in the shared preferences.
@@ -86,23 +88,23 @@ public class Scenarios {
                 || isScenarioActivated(Scenario.SCENARIO_HOME);
     }
 
-    public String getTargetActivity(Scenario scenario) {
+    public int getTargetActivity(Scenario scenario) {
         switch (scenario) {
-            case SCENARIO_HOME: return "STILL";
-            case SCENARIO_MUSIC: return "RUNNING";
-            case SCENARIO_WARNING: return "STILL";
+            case SCENARIO_HOME: return DetectedActivity.STILL;
+            case SCENARIO_MUSIC: return DetectedActivity.RUNNING;
+            case SCENARIO_WARNING: return DetectedActivity.STILL;
         }
-        return "UNKNOWN";
+        return DetectedActivity.UNKNOWN;
     }
 
-    public void setCurrentActivity(String activity) {
+    public void setCurrentActivity(int activity) {
         sharedPreferences.edit()
-                .putString("current_activity", activity)
+                .putInt("current_activity", activity)
                 .commit();
     }
 
-    public String getCurrentActivity() {
-        return sharedPreferences.getString("current_activity", "UNKNOWN");
+    public int getCurrentActivity() {
+        return sharedPreferences.getInt("current_activity", DetectedActivity.UNKNOWN);
     }
 
     public void setScenarioTriggered(Scenario scenario, boolean triggered) {

@@ -43,10 +43,10 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
             boolean wasTriggeringBefore = scenarios.getScenarioTriggered(scenario);
             Location fenceLocation = scenarios.getScenarioLocation(scenario);
             int radius = scenarios.getScenarioRadius(scenario);
-            String currentActivity = scenarios.getCurrentActivity();
+            int currentActivity = scenarios.getCurrentActivity();
 
             float distance = location.distanceTo(fenceLocation);
-            String targetActivity = scenarios.getTargetActivity(scenario);
+            int targetActivity = scenarios.getTargetActivity(scenario);
             boolean isInFence = distance < radius;
 
             scenarios.setScenarioTriggered(scenario, isInFence);
