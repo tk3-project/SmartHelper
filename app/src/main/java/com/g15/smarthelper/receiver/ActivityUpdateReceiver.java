@@ -65,6 +65,7 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
                 }
             }
         }
+        scenarios.setCurrentActivity(activityType);
     }
 
 }
