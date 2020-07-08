@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -84,11 +85,13 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             neededPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
         }
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            neededPermissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION);
-        }
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
-            neededPermissions.add(Manifest.permission.ACTIVITY_RECOGNITION);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                neededPermissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+            }
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
+                neededPermissions.add(Manifest.permission.ACTIVITY_RECOGNITION);
+            }
         }
 
         return neededPermissions.toArray(new String[neededPermissions.size()]);
