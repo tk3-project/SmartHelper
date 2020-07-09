@@ -119,6 +119,18 @@ public class Scenarios {
         return sharedPreferences.getBoolean(scenarioName, false);
     }
 
+    public void setScenarioGeofenceEntered(Scenario scenario, boolean entered) {
+        String scenarioName = "scenario" + scenario + "_geofence_entered";
+        sharedPreferences.edit()
+                .putBoolean(scenarioName, entered)
+                .commit();
+    }
+
+    public boolean getScenarioGeofenceEntered(Scenario scenario) {
+        String scenarioName = "scenario" + scenario + "_geofence_entered";
+        return sharedPreferences.getBoolean(scenarioName, false);
+    }
+
     public void setScenarioFence(Scenario scenario, double latitude, double longitude, int radius) {
         Log.i(LOG_TAG, "Changing scenario " + scenario + " location: lat=" + latitude
                 + ", lng=" + longitude + "(r=" + radius + ")");

@@ -40,7 +40,7 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
     private void processLocationUpdate(Context context, Scenarios scenarios, Location location) {
         Scenarios.Scenario[] availableScenarios = Scenarios.Scenario.values();
         for (Scenarios.Scenario scenario : availableScenarios) {
-            boolean wasTriggeringBefore = scenarios.getScenarioTriggered(scenario);
+            boolean wasInGeofenceBefore = scenarios.getScenarioGeofenceEntered(scenario);
             Location fenceLocation = scenarios.getScenarioLocation(scenario);
             int radius = scenarios.getScenarioRadius(scenario);
             int currentActivity = scenarios.getCurrentActivity();
@@ -49,12 +49,14 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
             int targetActivity = scenarios.getTargetActivity(scenario);
             boolean isInFence = distance < radius;
 
-            scenarios.setScenarioTriggered(scenario, isInFence);
+            scenarios.setScenarioGeofenceEntered(scenario, isInFence);
 
-            if (!wasTriggeringBefore && isInFence && targetActivity == currentActivity) {
+            if (!wasInGeofenceBefore && isInFence && targetActivity == currentActivity) {
                 Log.i(LOG_TAG, "Scenario " + scenario + " was triggered at location: " + location);
+                scenarios.setScenarioTriggered(scenario, true);
                 // TODO: Trigger scenario handler
-            } else if (wasTriggeringBefore && !isInFence) {
+            } else if (wasInGeofenceBefore && !isInFence) {
+                scenarios.setScenarioTriggered(scenario, false);
                 Log.i(LOG_TAG, "Scenario " + scenario + " was left.");
             }
         }

@@ -47,7 +47,8 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
     private void processActivityUpdate(Context context, Scenarios scenarios, int activityType) {
         Scenarios.Scenario[] availableScenarios = Scenarios.Scenario.values();
         for (Scenarios.Scenario scenario : availableScenarios) {
-            boolean isLocationTriggered = scenarios.getScenarioTriggered(scenario);
+            boolean isInFence = scenarios.getScenarioGeofenceEntered(scenario);
+            boolean previouslyTriggered = scenarios.getScenarioTriggered(scenario);
             int previousActivity = scenarios.getCurrentActivity();
 
             int targetActivity = scenarios.getTargetActivity(scenario);
@@ -55,8 +56,9 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
             if (activityType != previousActivity) {
                 Log.d(LOG_TAG, "Activity changed from " + previousActivity + " to " + activityType + ".");
 
-                if (isLocationTriggered && targetActivity == activityType) {
+                if (isInFence && !previouslyTriggered && targetActivity == activityType) {
                     Log.i(LOG_TAG, "Scenario " + scenario + " was triggered by activity " + activityType);
+                    scenarios.setScenarioTriggered(scenario, true);
                     // TODO: Trigger scenario handler
                 }
             }
