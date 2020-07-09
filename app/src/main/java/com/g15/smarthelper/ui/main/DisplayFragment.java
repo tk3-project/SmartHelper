@@ -69,7 +69,7 @@ public class DisplayFragment extends Fragment {
                 if (intent.getAction().equals(Constants.BROADCAST_DETECTED_ACTIVITY)) {
                     int type = intent.getIntExtra("type", -1);
                     int confidence = intent.getIntExtra("confidence", 0);
-                    Log.i(LOG_TAG, "BroadcastReceiver" + type);
+                    Log.i(LOG_TAG, "Broadcast: Activity received, Type = " + type + ", Confidence = " + confidence);
                     handleUserActivity(type, confidence);
                 }
             }

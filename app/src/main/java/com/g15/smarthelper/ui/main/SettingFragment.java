@@ -1,9 +1,11 @@
 package com.g15.smarthelper.ui.main;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -22,18 +24,21 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
 import com.g15.smarthelper.R;
 import com.g15.smarthelper.ScenarioHandler.WarningAction;
 import com.g15.smarthelper.Scenarios;
 import com.g15.smarthelper.Services.DetectedActivitiesService;
+import com.google.android.gms.location.DetectedActivity;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.g15.smarthelper.Constants;
 import static com.g15.smarthelper.Scenarios.SHARED_PREFERENCES_KEY;
 import com.g15.smarthelper.ui.main.DisplayFragment;
 
@@ -52,6 +57,9 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
     private int permissionCounter = 0;
 
     WarningAction warningAction;
+    BroadcastReceiver mReceiver;
+    LocalBroadcastManager broadcastManager;
+    IntentFilter intentFilter;
 
     @Override
     public View onCreateView(
@@ -216,8 +224,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
             Log.i(LOG_TAG, "Warning scenario state changed to: " + scenarioActivated);
             currentScenario = Scenarios.Scenario.SCENARIO_WARNING;
             if (scenarioActivated){
-                //TODO: change this tester.
-                warningAction.SendNotifications();
+                MonitorWarningCondition();
             }
         } else if (compoundButton == homeSwitch) {
             Log.i(LOG_TAG, "Home scenario state changed to: " + scenarioActivated);
@@ -241,7 +248,6 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         }
 
         setScenarioEnabled(currentScenario, scenarioActivated);
-        Log.i(LOG_TAG, "test");
 
         if (!scenarios.isAnyScenarioEnabled()) {
             // No scenario enabled. Disable location and activity tracking.
@@ -279,5 +285,35 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
      */
     private void setScenarioEnabled(Scenarios.Scenario scenario, boolean scenarioActivated) {
         scenarios.setScenarioEnabled(scenario, scenarioActivated);
+    }
+
+
+    // Process warning scenario here
+    private void MonitorWarningCondition(){
+
+        broadcastManager = LocalBroadcastManager.getInstance(getActivity());
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(Constants.BROADCAST_DETECTED_ACTIVITY);
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int type = intent.getIntExtra("type", -1);
+                int confidence = intent.getIntExtra("confidence", 0);
+                Log.i(LOG_TAG, "Broadcast: Activity received, Type = " + type + ", Confidence = " + confidence);
+                if (type == DetectedActivity.ON_FOOT || type == DetectedActivity.WALKING){
+                    if (confidence > Constants.CONFIDENCE) {
+                        warningAction.SendNotifications();
+                    }
+                }
+            }
+        };
+
+        broadcastManager.registerReceiver(mReceiver, intentFilter);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        broadcastManager.unregisterReceiver(mReceiver);
     }
 }
