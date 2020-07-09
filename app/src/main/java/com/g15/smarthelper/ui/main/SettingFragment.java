@@ -25,6 +25,7 @@ import androidx.fragment.app.FragmentManager;
 
 
 import com.g15.smarthelper.R;
+import com.g15.smarthelper.ScenarioHandler.WarningAction;
 import com.g15.smarthelper.Scenarios;
 import com.g15.smarthelper.Services.DetectedActivitiesService;
 import com.google.android.material.snackbar.Snackbar;
@@ -50,6 +51,8 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
     private List<String> missingPermissions = new ArrayList<>();
     private int permissionCounter = 0;
 
+    WarningAction warningAction;
+
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,6 +70,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         SharedPreferences sharedPreferences = getActivity()
                 .getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
         scenarios = new Scenarios(sharedPreferences);
+        warningAction = new WarningAction(getContext());
 
         initializeScenarioActivated();
 
@@ -205,12 +209,22 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         if (compoundButton == musicSwitch) {
             Log.i(LOG_TAG, "Music scenario state changed to: " + scenarioActivated);
             currentScenario = Scenarios.Scenario.SCENARIO_MUSIC;
+            if (scenarioActivated){
+                //TODO
+            }
         } else if (compoundButton == warningSwitch) {
             Log.i(LOG_TAG, "Warning scenario state changed to: " + scenarioActivated);
             currentScenario = Scenarios.Scenario.SCENARIO_WARNING;
+            if (scenarioActivated){
+                //TODO: change this tester.
+                warningAction.SendNotifications();
+            }
         } else if (compoundButton == homeSwitch) {
             Log.i(LOG_TAG, "Home scenario state changed to: " + scenarioActivated);
             currentScenario = Scenarios.Scenario.SCENARIO_HOME;
+            if (scenarioActivated){
+                //TODO
+            }
         } else {
             Log.w(LOG_TAG, "Invalid scenario change triggered.");
             return;

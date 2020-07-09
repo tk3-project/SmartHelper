@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,12 +26,13 @@ import com.google.android.gms.location.DetectedActivity;
 
 public class DisplayFragment extends Fragment {
 
-    private static String LOG_TAG = "show-fragment";
+    private static String LOG_TAG = "display-fragment";
     BroadcastReceiver broadcastReceiver;
+    ResultReceiver mResultReceiver;
 
     private TextView txtActivity, txtLocation;
     private ImageView imgActivity;
-    //private Button btnStartTracking, btnStopTracking;
+    private String mAddressOutput;
 
     @Override
     public View onCreateView(
@@ -45,27 +48,20 @@ public class DisplayFragment extends Fragment {
         txtActivity = getActivity().findViewById(R.id.txt_activity);
         txtLocation = getActivity().findViewById(R.id.txt_location);
         imgActivity = getActivity().findViewById(R.id.img_activity);
-        //btnStartTracking = getActivity().findViewById(R.id.btn_start_tracking);
-        //btnStopTracking = getActivity().findViewById(R.id.btn_stop_tracking);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        /*btnStartTracking.setOnClickListener(new View.OnClickListener() {
+        mResultReceiver = new ResultReceiver(new Handler()){
             @Override
-            public void onClick(View view) {
-                startTracking();
+            public void onReceiveResult(int resultCode, Bundle resultData){
+                mAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
+                handleUserLocation(mAddressOutput);
             }
-        });
+        };
 
-        btnStopTracking.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                stopTracking();
-            }
-        });*/
 
         broadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -78,6 +74,9 @@ public class DisplayFragment extends Fragment {
                 }
             }
         };
+    }
+    private void handleUserLocation(String Location){
+        txtLocation.setText(Location);
     }
 
     private void handleUserActivity(int type, int confidence) {
