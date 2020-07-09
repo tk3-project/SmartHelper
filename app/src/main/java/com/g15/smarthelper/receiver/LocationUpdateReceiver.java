@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.util.Log;
 
+import com.g15.smarthelper.ScenarioHandler.WarningAction;
 import com.g15.smarthelper.Scenarios;
 import com.google.android.gms.location.LocationResult;
 
@@ -55,6 +56,8 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
                 Log.i(LOG_TAG, "Scenario " + scenario + " was triggered at location: " + location);
                 scenarios.setScenarioTriggered(scenario, true);
                 // TODO: Trigger scenario handler
+                WarningAction warningAction = new WarningAction(context);
+                warningAction.SendNotifications();
             } else if (wasInGeofenceBefore && !isInFence) {
                 scenarios.setScenarioTriggered(scenario, false);
                 Log.i(LOG_TAG, "Scenario " + scenario + " was left.");

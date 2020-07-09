@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 
+import com.g15.smarthelper.ScenarioHandler.WarningAction;
 import com.g15.smarthelper.Scenarios;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
@@ -60,6 +61,8 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
                     Log.i(LOG_TAG, "Scenario " + scenario + " was triggered by activity " + activityType);
                     scenarios.setScenarioTriggered(scenario, true);
                     // TODO: Trigger scenario handler
+                    WarningAction warningAction = new WarningAction(context);
+                    warningAction.SendNotifications();
                 }
             }
         }
