@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">SmartHelper</string>
+    <string name="description">A context-awareness app.</string>
+    <string name="title">SmartHelper</string>
+    <string name="footer">TK3@group15</string>
+    <string name="tab_text_1">Settings</string>
+    <string name="tab_text_2">Context</string>
+
+    <string name="tab_1_title">Followings are the services we support. Please personalize yourself.</string>
+    <string name="tab_1_list_1">Music Assistant</string>
+    <string name="tab_1_list_2">Warning Assistant</string>
+    <string name="tab_1_list_3">Home Assistant</string>
+    <string name="tab_1_list_1_des">When you are running in a park with headphone plugged in, this service will automatically play music for you.</string>
+    <string name="tab_1_list_2_des">When you are walking near a market, this service will remind you to wear a mask.</string>
+    <string name="tab_1_list_3_des">When you are at home in late evening without using your phone, this service will automatically switch it to dark mode.</string>
+
+    <string name="tab_2_title">Followings are the detected user activity and location contexts.</string>
+    <string name="tab_2_activity">Detected Activity</string>
+    <string name="tab_2_location">Detected Location</string>
+
+    <string name="activity_in_vehicle">In Vehicle</string>
+    <string name="activity_on_bicycle">On Bicycle</string>
+    <string name="activity_on_foot">On Foot</string>
+    <string name="activity_running">Running</string>
+    <string name="activity_still">Still</string>
+    <string name="activity_tilting">Tilting</string>
+    <string name="activity_walking">walking</string>
+    <string name="activity_unknown">Unknown</string>
+
+    <string name="required_permissions_title">Permissions Needed</string>
+    <string name="required_permissions_message">To process your context correctly this app needs permission to access your location and activity data. Please grant the permissions for this app to work properly.</string>
+    <string name="required_permissions_cancel">Cancel</string>
+    <string name="required_permissions_confirm">Grant Access</string>
+    <string name="permission_dialog_canceled">The scenario could not be activated due to insufficient permissions.</string>
+
+    <string name="no_geocoder_available">No geocoder available</string>
+    <string name="fetch_address">Fetch address</string>
+    <string name="address_found">Address found</string>
+    <string name="no_address_found">Sorry, no address found</string>
+    <string name="no_location_data_provided">No location data provided</string>
+    <string name="service_not_available">Sorry, the service is not available</string>
+    <string name="invalid_lat_long_used">Invalid latitude or longitude used</string>
+    <string name="permission_rationale">Location permission is needed for core functionality</string>
+    <string name="permission_denied_explanation">Permission was denied, but is needed for core functionality.</string>
+
+    <!-- Scenario Warning -->
+    <string name="warning_notification_title">Be sure to wear your mask!</string>
+    <string name="warning_notification_text">Seems you are walking near a market. Please wear a mask!</string>
+
+</resources>
