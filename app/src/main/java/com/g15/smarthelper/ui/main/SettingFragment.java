@@ -1,15 +1,16 @@
 package com.g15.smarthelper.ui.main;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,21 +22,23 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
 import com.g15.smarthelper.MainActivity;
 import com.g15.smarthelper.R;
+import com.g15.smarthelper.ScenarioHandler.WarningAction;
 import com.g15.smarthelper.Scenarios;
 import com.g15.smarthelper.Services.DetectedActivitiesService;
+import com.google.android.gms.location.DetectedActivity;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.g15.smarthelper.Constants;
 import static com.g15.smarthelper.Scenarios.SHARED_PREFERENCES_KEY;
-import com.g15.smarthelper.ui.main.DisplayFragment;
 
 
 public class SettingFragment extends Fragment implements CompoundButton.OnCheckedChangeListener {
@@ -50,6 +53,11 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
     private CompoundButton currentTargetSwitch;
     private List<String> missingPermissions = new ArrayList<>();
     private int permissionCounter = 0;
+
+    WarningAction warningAction;
+    BroadcastReceiver mReceiver;
+    LocalBroadcastManager broadcastManager;
+    IntentFilter intentFilter;
 
     @Override
     public View onCreateView(
@@ -68,6 +76,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         SharedPreferences sharedPreferences = getActivity()
                 .getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
         scenarios = new Scenarios(sharedPreferences);
+        warningAction = new WarningAction(getContext());
 
         initializeScenarioActivated();
 
@@ -105,11 +114,13 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             neededPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
         }
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            neededPermissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION);
-        }
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
-            neededPermissions.add(Manifest.permission.ACTIVITY_RECOGNITION);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                neededPermissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+            }
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
+                neededPermissions.add(Manifest.permission.ACTIVITY_RECOGNITION);
+            }
         }
 
         return neededPermissions.toArray(new String[neededPermissions.size()]);
@@ -223,12 +234,21 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         if (compoundButton == musicSwitch) {
             Log.i(LOG_TAG, "Music scenario state changed to: " + scenarioActivated);
             currentScenario = Scenarios.Scenario.SCENARIO_MUSIC;
+            if (scenarioActivated){
+                //TODO
+            }
         } else if (compoundButton == warningSwitch) {
             Log.i(LOG_TAG, "Warning scenario state changed to: " + scenarioActivated);
             currentScenario = Scenarios.Scenario.SCENARIO_WARNING;
+            if (scenarioActivated){
+                MonitorWarningCondition();
+            }
         } else if (compoundButton == homeSwitch) {
             Log.i(LOG_TAG, "Home scenario state changed to: " + scenarioActivated);
             currentScenario = Scenarios.Scenario.SCENARIO_HOME;
+            if (scenarioActivated){
+                //TODO
+            }
         } else {
             Log.w(LOG_TAG, "Invalid scenario change triggered.");
             return;
@@ -284,5 +304,35 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
      */
     private void setScenarioEnabled(Scenarios.Scenario scenario, boolean scenarioActivated) {
         scenarios.setScenarioEnabled(scenario, scenarioActivated);
+    }
+
+
+    // Process warning scenario here
+    private void MonitorWarningCondition(){
+
+        broadcastManager = LocalBroadcastManager.getInstance(getActivity());
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(Constants.BROADCAST_DETECTED_ACTIVITY);
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int type = intent.getIntExtra("type", -1);
+                int confidence = intent.getIntExtra("confidence", 0);
+                Log.i(LOG_TAG, "Broadcast: Activity received, Type = " + type + ", Confidence = " + confidence);
+                if (type == DetectedActivity.ON_FOOT || type == DetectedActivity.WALKING){
+                    if (confidence > Constants.CONFIDENCE) {
+                        warningAction.SendNotifications();
+                    }
+                }
+            }
+        };
+
+        broadcastManager.registerReceiver(mReceiver, intentFilter);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        broadcastManager.unregisterReceiver(mReceiver);
     }
 }

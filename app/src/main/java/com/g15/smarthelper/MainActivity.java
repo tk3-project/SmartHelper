@@ -41,14 +41,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
-
-    private static final String ADDRESS_REQUESTED_KEY = "address-request-pending";
-    private static final String LOCATION_ADDRESS_KEY = "location-address";
-
-    private static final long UPDATE_INTERVAL = 30000; // 30 sec
-    private static final long FASTEST_UPDATE_INTERVAL = 10000; // 10 sec
-    private static final long MAX_WAIT_TIME = UPDATE_INTERVAL * 4; // 2 min
     private LocationRequest locationRequest;
 
     /**
@@ -121,9 +113,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void createLocationRequest() {
         locationRequest = new LocationRequest()
-                .setInterval(UPDATE_INTERVAL)
-                .setFastestInterval(FASTEST_UPDATE_INTERVAL)
-                .setMaxWaitTime(MAX_WAIT_TIME);
+                .setInterval(Constants.UPDATE_INTERVAL)
+                .setFastestInterval(Constants.FASTEST_UPDATE_INTERVAL)
+                .setMaxWaitTime(Constants.MAX_WAIT_TIME);
     }
 
     private PendingIntent getBackgroundLocationPendingIntent() {
@@ -246,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
                             // Request permission
                             ActivityCompat.requestPermissions(MainActivity.this,
                                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                    REQUEST_PERMISSIONS_REQUEST_CODE);
+                                    Constants.REQUEST_PERMISSIONS_REQUEST_CODE);
                         }
                     });
 
@@ -257,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
             // previously and checked "Never ask again".
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_PERMISSIONS_REQUEST_CODE);
+                    Constants.REQUEST_PERMISSIONS_REQUEST_CODE);
         }
     }
 
@@ -354,13 +346,13 @@ public class MainActivity extends AppCompatActivity {
     private void updateValuesFromBundle(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             // Check savedInstanceState to see if the address was previously requested.
-            if (savedInstanceState.keySet().contains(ADDRESS_REQUESTED_KEY)) {
-                mAddressRequested = savedInstanceState.getBoolean(ADDRESS_REQUESTED_KEY);
+            if (savedInstanceState.keySet().contains(Constants.ADDRESS_REQUESTED_KEY)) {
+                mAddressRequested = savedInstanceState.getBoolean(Constants.ADDRESS_REQUESTED_KEY);
             }
             // Check savedInstanceState to see if the location address string was previously found
             // and stored in the Bundle. If it was found, display the address string in the UI.
-            if (savedInstanceState.keySet().contains(LOCATION_ADDRESS_KEY)) {
-                mAddressOutput = savedInstanceState.getString(LOCATION_ADDRESS_KEY);
+            if (savedInstanceState.keySet().contains(Constants.LOCATION_ADDRESS_KEY)) {
+                mAddressOutput = savedInstanceState.getString(Constants.LOCATION_ADDRESS_KEY);
                 displayAddressOutput();
             }
         }

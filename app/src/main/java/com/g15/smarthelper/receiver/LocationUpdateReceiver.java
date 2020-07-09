@@ -7,8 +7,6 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.util.Log;
 
-import com.g15.smarthelper.ScenarioHandler.ScenarioHandler;
-import com.g15.smarthelper.ScenarioHandler.ScenarioSelector;
 import com.g15.smarthelper.Scenarios;
 import com.google.android.gms.location.LocationResult;
 
@@ -55,9 +53,7 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
 
             if (!wasTriggeringBefore && isInFence && targetActivity == currentActivity) {
                 Log.i(LOG_TAG, "Scenario " + scenario + " was triggered at location: " + location);
-                // Trigger scenario handler
-                ScenarioHandler handler = ScenarioSelector.getScenarioHandler(scenario);
-                handler.handleScenario(context);
+                // TODO: Trigger scenario handler
             } else if (wasTriggeringBefore && !isInFence) {
                 Log.i(LOG_TAG, "Scenario " + scenario + " was left.");
             }

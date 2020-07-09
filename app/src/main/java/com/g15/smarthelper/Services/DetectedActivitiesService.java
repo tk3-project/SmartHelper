@@ -62,7 +62,6 @@ public class DetectedActivitiesService extends Service{
         Task<Void> task = mActivityRecognitionClient.requestActivityUpdates(
                 Constants.DETECTION_INTERVAL_IN_MILLISECONDS,
                 mPendingIntent);
-        //Log.i(LOG_TAG, "requestActivityUpdatesHandler");
 
         task.addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override

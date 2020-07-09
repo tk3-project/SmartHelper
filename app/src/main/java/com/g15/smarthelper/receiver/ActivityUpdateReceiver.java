@@ -7,8 +7,6 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 
-import com.g15.smarthelper.ScenarioHandler.ScenarioHandler;
-import com.g15.smarthelper.ScenarioHandler.ScenarioSelector;
 import com.g15.smarthelper.Scenarios;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
@@ -59,9 +57,7 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
 
                 if (isLocationTriggered && targetActivity == activityType) {
                     Log.i(LOG_TAG, "Scenario " + scenario + " was triggered by activity " + activityType);
-                    // Trigger scenario handler
-                    ScenarioHandler handler = ScenarioSelector.getScenarioHandler(scenario);
-                    handler.handleScenario(context);
+                    // TODO: Trigger scenario handler
                 }
             }
         }
