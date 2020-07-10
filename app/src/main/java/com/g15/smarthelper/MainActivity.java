@@ -2,12 +2,17 @@ package com.g15.smarthelper;
 
 import android.Manifest;
 import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 
+import com.g15.smarthelper.Services.DetectedActivitiesService;
+import com.g15.smarthelper.Services.DetectedLocationService;
 import com.g15.smarthelper.Services.FetchAddressIntentService;
 import com.g15.smarthelper.receiver.ActivityUpdateReceiver;
 import com.g15.smarthelper.receiver.LocationUpdateReceiver;
@@ -29,6 +34,7 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.ResultReceiver;
 import android.util.Log;
 import android.view.View;
@@ -41,33 +47,19 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private LocationRequest locationRequest;
+    private DetectedLocationService locationService;
+    protected ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder binder) {
+            locationService = ((DetectedLocationService.IdentityBinder)binder).getService();
+        }
 
-    /**
-     * Provides access to the Fused Location Provider API.
-     */
-    private FusedLocationProviderClient mFusedLocationClient;
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            locationService = null;
+        }
+    };
 
-    /**
-     * Represents a geographical location.
-     */
-    private Location mLastLocation;
-
-    /**
-     * Tracks whether the user has requested an address. Becomes true when the user requests an
-     * address and false when the address (or an error message) is delivered.
-     */
-    private boolean mAddressRequested;
-
-    /**
-     * Receiver registered with this activity to get the response from FetchAddressIntentService.
-     */
-    private AddressResultReceiver mResultReceiver;
-
-    /**
-     * The formatted location address.
-     */
-    private String mAddressOutput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,53 +67,56 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initViews();
-
-        mResultReceiver = new AddressResultReceiver(new Handler());
-
-        // Set defaults, then update using values stored in the Bundle.
-        mAddressRequested = false;
-        mAddressOutput = "";
-        updateValuesFromBundle(savedInstanceState);
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-        if (mLastLocation != null) {
-            startIntentService();
-            return;
-        }
-
-        // If we have not yet retrieved the user location, we process the user's request by setting
-        // mAddressRequested to true. As far as the user is concerned, pressing the Fetch Address button
-        // immediately kicks off the process of getting the address.
-        mAddressRequested = true;
-
-        createLocationRequest();
-        //requestLocationUpdates();
     }
+
+    private void initViews(){
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
+        ViewPager viewPager = findViewById(R.id.view_pager);
+        viewPager.setAdapter(sectionsPagerAdapter);
+        TabLayout tabs = findViewById(R.id.tabs);
+        tabs.setupWithViewPager(viewPager);
+        FloatingActionButton fab = findViewById(R.id.fab);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        bindService(new Intent(this, DetectedLocationService.class),
+                serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        if (locationService != null) {
+            unbindService(serviceConnection);
+        }
+        super.onStop();
+    }
+
 
     public void requestLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.e(TAG, "Necessary permission to access location is not granted. Location updates cannot be processed.");
             return;
         }
-        mFusedLocationClient.requestLocationUpdates(locationRequest, getBackgroundLocationPendingIntent());
+        if (locationService != null) {
+            locationService.startTracking();
+        }
     }
 
     public void removeLocationUpdates() {
-        mFusedLocationClient.removeLocationUpdates(getBackgroundLocationPendingIntent());
-    }
-
-    private void createLocationRequest() {
-        locationRequest = new LocationRequest()
-                .setInterval(Constants.UPDATE_INTERVAL)
-                .setFastestInterval(Constants.FASTEST_UPDATE_INTERVAL)
-                .setMaxWaitTime(Constants.MAX_WAIT_TIME);
-    }
-
-    private PendingIntent getBackgroundLocationPendingIntent() {
-        Intent intent = new Intent(this, LocationUpdateReceiver.class);
-        return PendingIntent.getBroadcast(
-                this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if (locationService != null) {
+            locationService.stopTracking();
+        }
     }
 
     public void requestActivityUpdates() {
@@ -140,24 +135,14 @@ public class MainActivity extends AppCompatActivity {
                 this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
 
-        if (!checkPermissions()) {
-            requestPermissions();
-        } else {
-            Log.d(TAG, "getting address");
-            getAddress();
-            Log.d(TAG, "got address");
-        }
-    }
+    // --- Fetch Address ---
 
     /**
      * Gets the address for the last known location.
      */
-    @SuppressWarnings("MissingPermission")
-    private void getAddress() {
+    //@SuppressWarnings("MissingPermission")
+    /*private void getAddress() {
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
@@ -189,13 +174,13 @@ public class MainActivity extends AppCompatActivity {
                         Log.w(TAG, "getLastLocation:onFailure", e);
                     }
                 });
-    }
+    }*/
 
     /**
      * Creates an intent, adds location data to it as an extra, and starts the intent service for
      * fetching an address.
      */
-    private void startIntentService() {
+    /*private void startIntentService() {
         // Create an intent for passing to the intent service responsible for fetching the address.
         Intent intent = new Intent(this, FetchAddressIntentService.class);
 
@@ -210,12 +195,12 @@ public class MainActivity extends AppCompatActivity {
         // service kills itself automatically once all intents are processed.
         startService(intent);
         Log.d(TAG, "started service");
-    }
+    }*/
 
     /**
      * Return the current state of the permissions needed.
      */
-    private boolean checkPermissions() {
+    /*private boolean checkPermissions() {
         int permissionState = ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
         return permissionState == PackageManager.PERMISSION_GRANTED;
@@ -251,19 +236,19 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     Constants.REQUEST_PERMISSIONS_REQUEST_CODE);
         }
-    }
+    }*/
 
     /**
      * Shows a {@link Snackbar} using {@code text}.
      *
      * @param text The Snackbar text.
      */
-    private void showSnackbar(final String text) {
+    /*private void showSnackbar(final String text) {
         View container = findViewById(android.R.id.content);
         if (container != null) {
             Snackbar.make(container, text, Snackbar.LENGTH_LONG).show();
         }
-    }
+    }*/
 
     /**
      * Shows a {@link Snackbar}.
@@ -272,43 +257,25 @@ public class MainActivity extends AppCompatActivity {
      * @param actionStringId   The text of the action item.
      * @param listener         The listener associated with the Snackbar action.
      */
-    private void showSnackbar(final int mainTextStringId, final int actionStringId,
+    /*private void showSnackbar(final int mainTextStringId, final int actionStringId,
                               View.OnClickListener listener) {
         Snackbar.make(findViewById(android.R.id.content),
                 getString(mainTextStringId),
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(getString(actionStringId), listener).show();
-    }
-
-
-    private void initViews(){
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
-        ViewPager viewPager = findViewById(R.id.view_pager);
-        viewPager.setAdapter(sectionsPagerAdapter);
-        TabLayout tabs = findViewById(R.id.tabs);
-        tabs.setupWithViewPager(viewPager);
-        FloatingActionButton fab = findViewById(R.id.fab);
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-    }
+    }*/
 
     /**
      * Receiver for data sent from FetchAddressIntentService.
      */
-    private class AddressResultReceiver extends ResultReceiver {
+    /*private class AddressResultReceiver extends ResultReceiver {
         AddressResultReceiver(Handler handler) {
             super(handler);
         }
 
         /**
          *  Receives data sent from FetchAddressIntentService and updates the UI in MainActivity.
-         */
+         *
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
 
@@ -324,26 +291,26 @@ public class MainActivity extends AppCompatActivity {
             // Reset. Enable the Fetch Address button and stop showing the progress bar.
             mAddressRequested = false;
         }
-    }
+    }*/
 
     /**
      * Updates the address in the UI.
      */
-    private void displayAddressOutput() {
+    /*private void displayAddressOutput() {
         Log.d(TAG, "mAddressOutput: " + mAddressOutput);
-    }
+    }*/
 
     /**
      * Shows a toast with the given text.
      */
-    private void showToast(String text) {
+    /*private void showToast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
-    }
+    }*/
 
     /**
      * Updates fields based on data stored in the bundle.
      */
-    private void updateValuesFromBundle(Bundle savedInstanceState) {
+    /*private void updateValuesFromBundle(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             // Check savedInstanceState to see if the address was previously requested.
             if (savedInstanceState.keySet().contains(Constants.ADDRESS_REQUESTED_KEY)) {
@@ -356,5 +323,5 @@ public class MainActivity extends AppCompatActivity {
                 displayAddressOutput();
             }
         }
-    }
+    }*/
 }

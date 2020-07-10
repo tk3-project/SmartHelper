@@ -13,9 +13,9 @@ public class Constants {
     // Location
     public static final String ADDRESS_REQUESTED_KEY = "address-request-pending";
     public static final String LOCATION_ADDRESS_KEY = "location-address";
-    public static final long UPDATE_INTERVAL = 30000; // 30 sec
+    public static final long UPDATE_INTERVAL = 20000; // 20 sec
     public static final long FASTEST_UPDATE_INTERVAL = 10000; // 10 sec
-    public static final long MAX_WAIT_TIME = UPDATE_INTERVAL * 4; // 2 min
+    public static final long MAX_WAIT_TIME = UPDATE_INTERVAL * 4; // 80 sec
     public static final int SUCCESS_RESULT = 0;
     public static final int FAILURE_RESULT = 1;
     public static final String RECEIVER = PACKAGE_NAME + ".RECEIVER";

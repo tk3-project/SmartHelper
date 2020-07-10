@@ -38,7 +38,8 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
         }
     }
 
-    private void processLocationUpdate(Context context, Scenarios scenarios, Location location) {
+    public static void processLocationUpdate(Context context, Scenarios scenarios, Location location) {
+        Log.d(LOG_TAG, "Processing location updates");
         Scenarios.Scenario[] availableScenarios = Scenarios.Scenario.values();
         for (Scenarios.Scenario scenario : availableScenarios) {
             boolean wasInGeofenceBefore = scenarios.getScenarioGeofenceEntered(scenario);

@@ -241,7 +241,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
             Log.i(LOG_TAG, "Warning scenario state changed to: " + scenarioActivated);
             currentScenario = Scenarios.Scenario.SCENARIO_WARNING;
             if (scenarioActivated){
-                MonitorWarningCondition();
+                //MonitorWarningCondition();
             }
         } else if (compoundButton == homeSwitch) {
             Log.i(LOG_TAG, "Home scenario state changed to: " + scenarioActivated);
@@ -333,6 +333,6 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
     @Override
     public void onDestroy() {
         super.onDestroy();
-        broadcastManager.unregisterReceiver(mReceiver);
+        //broadcastManager.unregisterReceiver(mReceiver);
     }
 }

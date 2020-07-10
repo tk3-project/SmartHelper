@@ -44,6 +44,9 @@
     <string name="permission_denied_explanation">Permission was denied, but is needed for core
         functionality.</string>
 
+    <string name="foreground_service_msg">The SmartHelper is tracking your activity and location in the background. To stop this functionality, disable all scenarios in the app.</string>
+    <string name="foreground_service_title">SmartHelper Monitoring</string>
+
     <!-- Scenario Warning -->
     <string name="warning_notification_title">Be sure to wear your mask!</string>
     <string name="warning_notification_text">Seems you are walking near a market. Please wear a mask!</string>
