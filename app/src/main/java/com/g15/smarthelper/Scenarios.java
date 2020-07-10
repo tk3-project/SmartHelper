@@ -1,7 +1,10 @@
 package com.g15.smarthelper;
 
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.util.Log;
+
+import com.google.android.gms.location.DetectedActivity;
 
 /**
  * This class allows access to the activation state of the scenarios.
@@ -24,6 +27,7 @@ public class Scenarios {
     public Scenarios(SharedPreferences sharedPreferences) {
         this.sharedPreferences = sharedPreferences;
     }
+
 
     /**
      * Returns if the specified scenario is currently activated.
@@ -82,6 +86,85 @@ public class Scenarios {
         return isScenarioActivated(Scenario.SCENARIO_MUSIC)
                 || isScenarioActivated(Scenario.SCENARIO_WARNING)
                 || isScenarioActivated(Scenario.SCENARIO_HOME);
+    }
+
+    public int getTargetActivity(Scenario scenario) {
+        switch (scenario) {
+            case SCENARIO_HOME: return DetectedActivity.STILL;
+            case SCENARIO_MUSIC: return DetectedActivity.RUNNING;
+            case SCENARIO_WARNING: return DetectedActivity.STILL;
+        }
+        return DetectedActivity.UNKNOWN;
+    }
+
+    public void setCurrentActivity(int activity) {
+        sharedPreferences.edit()
+                .putInt("current_activity", activity)
+                .commit();
+    }
+
+    public int getCurrentActivity() {
+        return sharedPreferences.getInt("current_activity", DetectedActivity.UNKNOWN);
+    }
+
+    public void setScenarioTriggered(Scenario scenario, boolean triggered) {
+        String scenarioName = "scenario" + scenario + "_triggered";
+        sharedPreferences.edit()
+                .putBoolean(scenarioName, triggered)
+                .commit();
+    }
+
+    public boolean getScenarioTriggered(Scenario scenario) {
+        String scenarioName = "scenario" + scenario + "_triggered";
+        return sharedPreferences.getBoolean(scenarioName, false);
+    }
+
+    public void setScenarioGeofenceEntered(Scenario scenario, boolean entered) {
+        String scenarioName = "scenario" + scenario + "_geofence_entered";
+        sharedPreferences.edit()
+                .putBoolean(scenarioName, entered)
+                .commit();
+    }
+
+    public boolean getScenarioGeofenceEntered(Scenario scenario) {
+        String scenarioName = "scenario" + scenario + "_geofence_entered";
+        return sharedPreferences.getBoolean(scenarioName, false);
+    }
+
+    public void setScenarioFence(Scenario scenario, double latitude, double longitude, int radius) {
+        Log.i(LOG_TAG, "Changing scenario " + scenario + " location: lat=" + latitude
+                + ", lng=" + longitude + "(r=" + radius + ")");
+        String scenarioName = "scenario" + scenario;
+        sharedPreferences.edit()
+                .putLong(scenarioName + "_lat", Double.doubleToRawLongBits(latitude))
+                .putLong(scenarioName + "_lng", Double.doubleToRawLongBits(longitude))
+                .putInt(scenarioName + "_radius", radius)
+                .putBoolean(scenarioName + "_location_set", true)
+                .commit();
+    }
+
+    public Location getScenarioLocation(Scenario scenario) {
+        String scenarioName = "scenario" + scenario;
+        boolean locationSet = sharedPreferences.getBoolean(scenarioName + "_location_set", false);
+        if (!locationSet) {
+            return null;
+        }
+        double latitude = Double.longBitsToDouble(sharedPreferences.getLong(scenarioName + "_lat", 0));
+        double longitude = Double.longBitsToDouble(sharedPreferences.getLong(scenarioName + "_lng", 0));
+        Location location = new Location("");
+        location.setLatitude(latitude);
+        location.setLongitude(longitude);
+        return location;
+    }
+
+    public int getScenarioRadius(Scenario scenario) {
+        String scenarioName = "scenario" + scenario;
+        boolean locationSet = sharedPreferences.getBoolean(scenarioName + "_location_set", false);
+        if (!locationSet) {
+            return -1;
+        } else {
+            return sharedPreferences.getInt(scenarioName + "_radius", 0);
+        }
     }
 
 }

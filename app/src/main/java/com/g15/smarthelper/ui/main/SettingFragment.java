@@ -11,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,10 +22,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
+import com.g15.smarthelper.MainActivity;
 import com.g15.smarthelper.R;
 import com.g15.smarthelper.ScenarioHandler.WarningAction;
 import com.g15.smarthelper.Scenarios;
@@ -40,7 +39,6 @@ import java.util.List;
 
 import com.g15.smarthelper.Constants;
 import static com.g15.smarthelper.Scenarios.SHARED_PREFERENCES_KEY;
-import com.g15.smarthelper.ui.main.DisplayFragment;
 
 
 public class SettingFragment extends Fragment implements CompoundButton.OnCheckedChangeListener {
@@ -55,11 +53,6 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
     private CompoundButton currentTargetSwitch;
     private List<String> missingPermissions = new ArrayList<>();
     private int permissionCounter = 0;
-
-    WarningAction warningAction;
-    BroadcastReceiver mReceiver;
-    LocalBroadcastManager broadcastManager;
-    IntentFilter intentFilter;
 
     @Override
     public View onCreateView(
@@ -78,17 +71,36 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         SharedPreferences sharedPreferences = getActivity()
                 .getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
         scenarios = new Scenarios(sharedPreferences);
-        warningAction = new WarningAction(getContext());
 
         initializeScenarioActivated();
 
         musicSwitch.setOnCheckedChangeListener(this);
         warningSwitch.setOnCheckedChangeListener(this);
         homeSwitch.setOnCheckedChangeListener(this);
+
+        setInitialLocation();
+    }
+
+    private void setInitialLocation() {
+        double herrnGartenLat = 49.8775;
+        double herrnGartenLng = 8.6525;
+        int herrnGartenRadius = 150; // in meters
+        scenarios.setScenarioFence(Scenarios.Scenario.SCENARIO_MUSIC, herrnGartenLat, herrnGartenLng, herrnGartenRadius);
+
+        double homeLat = 49.8727;
+        double homeLng = 8.6312;
+        int homeRadius = 50; // in meters
+        scenarios.setScenarioFence(Scenarios.Scenario.SCENARIO_HOME, homeLat, homeLng, homeRadius);
+
+        double warningLat = 49.8521;
+        double warningLng = 8.6463;
+        int warningRadius = 50; // in meters
+        scenarios.setScenarioFence(Scenarios.Scenario.SCENARIO_WARNING, warningLat, warningLng, warningRadius);
     }
 
     /**
      * Checks which of the necessary permissions are granted.
+     *
      * @return A list of permission identifiers that are not granted, but needed.
      */
     private String[] identifyNeededPermissions() {
@@ -111,6 +123,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
 
     /**
      * Checks if all needed permissions are granted.
+     *
      * @return true if all permissions are granted, otherwise false.
      */
     private boolean checkPermissions() {
@@ -159,7 +172,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         if (missingPermissions.size() > 0) {
             String permission = missingPermissions.remove(0);
             Log.d(LOG_TAG, "Requesting missing permission: " + permission);
-            requestPermissions(new String[] {permission}, ++permissionCounter);
+            requestPermissions(new String[]{permission}, ++permissionCounter);
         }
     }
 
@@ -177,7 +190,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
             // The permissions have to be requested individually to work on Android 10.
             String permission = missingPermissions.remove(0);
             Log.d(LOG_TAG, "Requesting missing permission: " + permission);
-            requestPermissions(new String[] {permission}, ++permissionCounter);
+            requestPermissions(new String[]{permission}, ++permissionCounter);
         } else {
             Log.i(LOG_TAG, "All needed permissions granted.");
             if (currentTargetScenario != null) {
@@ -217,21 +230,12 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         if (compoundButton == musicSwitch) {
             Log.i(LOG_TAG, "Music scenario state changed to: " + scenarioActivated);
             currentScenario = Scenarios.Scenario.SCENARIO_MUSIC;
-            if (scenarioActivated){
-                //TODO
-            }
         } else if (compoundButton == warningSwitch) {
             Log.i(LOG_TAG, "Warning scenario state changed to: " + scenarioActivated);
             currentScenario = Scenarios.Scenario.SCENARIO_WARNING;
-            if (scenarioActivated){
-                MonitorWarningCondition();
-            }
         } else if (compoundButton == homeSwitch) {
             Log.i(LOG_TAG, "Home scenario state changed to: " + scenarioActivated);
             currentScenario = Scenarios.Scenario.SCENARIO_HOME;
-            if (scenarioActivated){
-                //TODO
-            }
         } else {
             Log.w(LOG_TAG, "Invalid scenario change triggered.");
             return;
@@ -253,7 +257,6 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
             // No scenario enabled. Disable location and activity tracking.
             disableLocationAndActivityTracking();
         } else if (!activatedBefore) {
-            Log.i(LOG_TAG, "tracking enabled");
             // The first scenario has been activated. Enable location and activity tracking.
             enableLocationAndActivityTracking();
         }
@@ -263,57 +266,27 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
      * Enable and initialize the tracking of location and activity of the user.
      */
     private void enableLocationAndActivityTracking() {
-
-        Intent intent = new Intent(getActivity(), DetectedActivitiesService.class);
-        getContext().startService(intent);
-        Log.i(LOG_TAG, "Start Tracking");
+        Log.i(LOG_TAG, "Start activity and location tracking.");
+        ((MainActivity) getActivity()).requestLocationUpdates();
+        ((MainActivity) getActivity()).requestActivityUpdates();
     }
 
     /**
      * Disable the tracking of location and activity of the user.
      */
     private void disableLocationAndActivityTracking() {
-        Intent intent = new Intent(getActivity(), DetectedActivitiesService.class);
-        getContext().stopService(intent);
-        Log.i(LOG_TAG, "Stop Tracking");
+        Log.i(LOG_TAG, "Stop activity and location tracking.");
+        ((MainActivity) getActivity()).removeLocationUpdates();
+        ((MainActivity) getActivity()).removeActivityUpdates();
     }
 
     /**
      * This method changes the activation state of a scenario.
-     * @param scenario The scenario to change.
+     *
+     * @param scenario          The scenario to change.
      * @param scenarioActivated If the scenario should be enabled or disabled.
      */
     private void setScenarioEnabled(Scenarios.Scenario scenario, boolean scenarioActivated) {
         scenarios.setScenarioEnabled(scenario, scenarioActivated);
-    }
-
-
-    // Process warning scenario here
-    private void MonitorWarningCondition(){
-
-        broadcastManager = LocalBroadcastManager.getInstance(getActivity());
-        intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.BROADCAST_DETECTED_ACTIVITY);
-        mReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                int type = intent.getIntExtra("type", -1);
-                int confidence = intent.getIntExtra("confidence", 0);
-                Log.i(LOG_TAG, "Broadcast: Activity received, Type = " + type + ", Confidence = " + confidence);
-                if (type == DetectedActivity.ON_FOOT || type == DetectedActivity.WALKING){
-                    if (confidence > Constants.CONFIDENCE) {
-                        warningAction.SendNotifications();
-                    }
-                }
-            }
-        };
-
-        broadcastManager.registerReceiver(mReceiver, intentFilter);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        broadcastManager.unregisterReceiver(mReceiver);
     }
 }

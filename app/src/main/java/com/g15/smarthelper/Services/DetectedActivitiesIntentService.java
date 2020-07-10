@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public class DetectedActivitiesIntentService extends IntentService{
 
-    protected static final String LOG_TAG = DetectedActivitiesIntentService.class.getSimpleName();
+    protected static final String LOG_TAG = "DetectedActivitiesIS";
 
     public DetectedActivitiesIntentService() {
         super(LOG_TAG);
@@ -22,7 +22,7 @@ public class DetectedActivitiesIntentService extends IntentService{
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(LOG_TAG, "Intent Service created");
+        Log.i(LOG_TAG, "Activity Intent Service created");
     }
 
     /** Define an onHandleIntent() method, which will be called

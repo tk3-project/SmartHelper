@@ -25,30 +25,30 @@ public class DetectedActivitiesService extends Service{
     private PendingIntent mPendingIntent;
     private ActivityRecognitionClient mActivityRecognitionClient;
 
-    IBinder mBinder = new DetectedActivitiesService.LocalBinder();
+    private final IBinder mBinder = new LocalBinder();
 
     public class LocalBinder extends Binder {
-        public DetectedActivitiesService getServerInstance() {
+        public DetectedActivitiesService getService() {
             return DetectedActivitiesService.this;
         }
     }
 
-    public DetectedActivitiesService() { }
-
     @Override
     public void onCreate() {
-        super.onCreate();
+
+        Log.i(LOG_TAG, "Activity service created");
+
         mActivityRecognitionClient = new ActivityRecognitionClient(this);
         mIntentService = new Intent(this, DetectedActivitiesIntentService.class);
         mPendingIntent = PendingIntent.getService(this, 1, mIntentService, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        //Log.i(LOG_TAG, "BGservice created");
-        requestActivityUpdatesHandler();
     }
+
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        Log.v(LOG_TAG, "Bound to DetectedActivitiesService");
         return mBinder;
     }
 
@@ -58,7 +58,8 @@ public class DetectedActivitiesService extends Service{
         return START_STICKY;
     }
 
-    public void requestActivityUpdatesHandler() {
+    public void startTracking() {
+        Log.i(LOG_TAG, "Starting activity tracking.");
         Task<Void> task = mActivityRecognitionClient.requestActivityUpdates(
                 Constants.DETECTION_INTERVAL_IN_MILLISECONDS,
                 mPendingIntent);
@@ -84,7 +85,8 @@ public class DetectedActivitiesService extends Service{
         });
     }
 
-    public void removeActivityUpdatesHandler() {
+    public void stopTracking() {
+        Log.i(LOG_TAG, "Stopping activity tracking.");
         Task<Void> task = mActivityRecognitionClient.removeActivityUpdates(
                 mPendingIntent);
         task.addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -109,6 +111,6 @@ public class DetectedActivitiesService extends Service{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        removeActivityUpdatesHandler();
+        stopTracking();
     }
 }
