@@ -38,7 +38,7 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
         }
     }
 
-    public static void processLocationUpdate(Context context, Scenarios scenarios, Location location) {
+    private void processLocationUpdate(Context context, Scenarios scenarios, Location location) {
         Log.d(LOG_TAG, "Processing location updates");
         Scenarios.Scenario[] availableScenarios = Scenarios.Scenario.values();
         for (Scenarios.Scenario scenario : availableScenarios) {
