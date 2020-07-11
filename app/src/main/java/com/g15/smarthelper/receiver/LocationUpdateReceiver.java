@@ -7,6 +7,9 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.util.Log;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import com.g15.smarthelper.Constants;
 import com.g15.smarthelper.ScenarioHandler.HomeAction;
 import com.g15.smarthelper.ScenarioHandler.MusicAction;
 import com.g15.smarthelper.ScenarioHandler.WarningAction;
@@ -23,7 +26,7 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent != null && LocationResult.hasResult(intent)) {
-            Log.d(LOG_TAG, "Received a location update intent.");
+            Log.e(LOG_TAG, "Received a location update intent.");
             LocationResult result = LocationResult.extractResult(intent);
             if (result != null) {
                 List<Location> locations = result.getLocations();
@@ -34,10 +37,19 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
                         SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
                 Scenarios scenarios = new Scenarios(sharedPreferences);
                 for (Location location : locations) {
+                    broadcastLocation(location, context);
                     processLocationUpdate(context, scenarios, location);
                 }
             }
         }
+    }
+
+    private void broadcastLocation(Location location, Context context) {
+        Intent intent = new Intent(Constants.BROADCAST_DETECTED_LOCATION);
+        intent.putExtra("latitude", location.getLatitude());
+        intent.putExtra("longtitude", location.getLongitude());
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        Log.i(LOG_TAG, "Location update already sent");
     }
 
     private void processLocationUpdate(Context context, Scenarios scenarios, Location location) {

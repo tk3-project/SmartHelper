@@ -26,7 +26,7 @@ import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private DetectedLocationService locationService;
     private DetectedActivitiesService activitiesService;
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void requestLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.e(TAG, "Necessary permission to access location is not granted. Location updates cannot be processed.");
+            Log.e(LOG_TAG, "Necessary permission to access location is not granted. Location updates cannot be processed.");
             return;
         }
         if (locationService != null) {

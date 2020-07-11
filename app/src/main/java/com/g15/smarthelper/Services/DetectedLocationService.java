@@ -26,6 +26,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.g15.smarthelper.Constants;
+import com.g15.smarthelper.MainActivity;
 import com.g15.smarthelper.R;
 import com.g15.smarthelper.Scenarios;
 import com.g15.smarthelper.receiver.LocationUpdateReceiver;
@@ -128,12 +129,6 @@ public class DetectedLocationService extends Service {
         return true;
     }
 
-    private PendingIntent getPendingIntent() {
-        Intent intent = new Intent(this, FetchAddressIntentService.class);
-        intent.setAction(Constants.ACTION_PROCESS_UPDATES);
-        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-    }
-
     private PendingIntent getBroadcastPendingIntent() {
         Intent intent = new Intent(this, LocationUpdateReceiver.class);
         return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -144,8 +139,25 @@ public class DetectedLocationService extends Service {
         Log.i(LOG_TAG, "Starting location tracking.");
         startService(new Intent(getApplicationContext(), DetectedLocationService.class));
         try {
-            fusedLocationClient.requestLocationUpdates(locationRequest, getPendingIntent());
-            fusedLocationClient.requestLocationUpdates(locationRequest, getBroadcastPendingIntent());
+            fusedLocationClient.requestLocationUpdates(locationRequest, getBroadcastPendingIntent())
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void result) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Successfully requested location updates",
+                                    Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Requesting location updates failed to start",
+                                    Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+                    });
             isActive = true;
         } catch (SecurityException ex) {
             Log.e(LOG_TAG, "Location permission denied.", ex);
@@ -155,17 +167,39 @@ public class DetectedLocationService extends Service {
     public void stopTracking() {
         Log.i(LOG_TAG, "Stopping location tracking.");
         isActive = false;
-        fusedLocationClient.removeLocationUpdates(getPendingIntent());
-        fusedLocationClient.removeLocationUpdates(getBroadcastPendingIntent());
+        fusedLocationClient.removeLocationUpdates(getBroadcastPendingIntent())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        Toast.makeText(getApplicationContext(),
+                                "Successfully removed location updates",
+                                Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(),
+                                "Removing location updates failed to start",
+                                Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                });
     }
 
     private Notification createForegroundNotification () {
         Log.v(LOG_TAG, "Creating foreground notification.");
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentText(getString(R.string.foreground_service_msg))
                 .setContentTitle(getString(R.string.foreground_service_title))
                 .setOngoing(true)
                 .setPriority(Notification.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setWhen(System.currentTimeMillis());
 

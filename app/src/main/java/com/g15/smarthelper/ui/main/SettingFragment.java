@@ -47,9 +47,6 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
 
     private static String LOG_TAG = "settings-fragment";
 
-    ActivityUpdateReceiver activityReceiver = new ActivityUpdateReceiver();
-    LocationUpdateReceiver locationReceiver = new LocationUpdateReceiver();
-
     private Switch musicSwitch;
     private Switch warningSwitch;
     private Switch homeSwitch;

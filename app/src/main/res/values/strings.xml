@@ -26,6 +26,7 @@
     <string name="activity_tilting">Tilting</string>
     <string name="activity_walking">walking</string>
     <string name="activity_unknown">Unknown</string>
+    <string name="location_unknown">Unknown</string>
 
     <string name="required_permissions_title">Permissions Needed</string>
     <string name="required_permissions_message">To process your context correctly this app needs permission to access your location and activity data. Please grant the permissions for this app to work properly.</string>
