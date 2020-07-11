@@ -15,16 +15,15 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.g15.smarthelper.R;
-import com.g15.smarthelper.MainActivity;
 
 
-public class WarningAction extends ContextWrapper {
+public class MusicAction extends ContextWrapper {
 
-    private static final String LOG_TAG = "ScenarioWarning";
-    private static final String CHANNEL_ID = "channel_01";
+    private static final String LOG_TAG = "ScenarioMusic";
+    private static final String CHANNEL_ID = "channel_02";
     private static int notificationId = 1;
 
-    public WarningAction(Context base) {
+    public MusicAction(Context base) {
         super(base);
     }
 
@@ -44,15 +43,15 @@ public class WarningAction extends ContextWrapper {
     public void sendNotification() {
         createNotificationChannel();
 
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        Intent intent = new Intent("android.intent.action.MUSIC_PLAYER");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setColor(getResources().getColor(R.color.colorPrimary))
-                .setContentTitle(getString(R.string.warning_notification_title))
-                .setContentText(getString(R.string.warning_notification_text))
+                .setContentTitle(getString(R.string.music_notification_title))
+                .setContentText(getString(R.string.music_notification_text))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)

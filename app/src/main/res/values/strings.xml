@@ -51,4 +51,12 @@
     <string name="warning_notification_title">Be sure to wear your mask!</string>
     <string name="warning_notification_text">Seems you are walking near a market. Please wear a mask!</string>
 
+    <!-- Scenario Music -->
+    <string name="music_notification_title">Start your music!</string>
+    <string name="music_notification_text">Seems you are running in the park. Tap here to play some music.</string>
+
+    <!-- Scenario Home -->
+    <string name="home_notification_title">It\'s getting late.</string>
+    <string name="home_notification_text">Prepare for good sleep by enabling the night mode on your smartphone.</string>
+
 </resources>

@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.UiModeManager;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.os.Build;
 
 import android.util.Log;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -18,13 +20,13 @@ import com.g15.smarthelper.R;
 import com.g15.smarthelper.MainActivity;
 
 
-public class WarningAction extends ContextWrapper {
+public class HomeAction extends ContextWrapper {
 
-    private static final String LOG_TAG = "ScenarioWarning";
-    private static final String CHANNEL_ID = "channel_01";
+    private static final String LOG_TAG = "ScenarioHome";
+    private static final String CHANNEL_ID = "channel_03";
     private static int notificationId = 1;
 
-    public WarningAction(Context base) {
+    public HomeAction(Context base) {
         super(base);
     }
 
@@ -51,8 +53,8 @@ public class WarningAction extends ContextWrapper {
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setColor(getResources().getColor(R.color.colorPrimary))
-                .setContentTitle(getString(R.string.warning_notification_title))
-                .setContentText(getString(R.string.warning_notification_text))
+                .setContentTitle(getString(R.string.home_notification_title))
+                .setContentText(getString(R.string.home_notification_text))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
