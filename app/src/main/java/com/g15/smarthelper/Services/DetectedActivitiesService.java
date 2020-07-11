@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.g15.smarthelper.Constants;
+import com.g15.smarthelper.receiver.ActivityUpdateReceiver;
 import com.google.android.gms.location.ActivityRecognitionClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -83,6 +84,8 @@ public class DetectedActivitiesService extends Service{
                         .show();
             }
         });
+
+        mActivityRecognitionClient.requestActivityUpdates(Constants.DETECTION_INTERVAL_IN_MILLISECONDS, getBroadcastPendingIntent());
     }
 
     public void stopTracking() {
@@ -106,11 +109,12 @@ public class DetectedActivitiesService extends Service{
                         Toast.LENGTH_SHORT).show();
             }
         });
+
+        mActivityRecognitionClient.removeActivityUpdates(getBroadcastPendingIntent());
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        stopTracking();
+    private PendingIntent getBroadcastPendingIntent() {
+        Intent intent = new Intent(this, ActivityUpdateReceiver.class);
+        return PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }
