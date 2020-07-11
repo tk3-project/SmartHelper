@@ -10,6 +10,7 @@ import android.util.Log;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.g15.smarthelper.Constants;
+import com.g15.smarthelper.ScenarioHandler.HomeAction;
 import com.g15.smarthelper.ScenarioHandler.WarningAction;
 import com.g15.smarthelper.Scenarios;
 import com.google.android.gms.location.ActivityRecognitionResult;
@@ -75,9 +76,13 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
                 if (isInFence && !previouslyTriggered && targetActivity == activityType) {
                     Log.i(LOG_TAG, "Scenario " + scenario + " was triggered by activity " + activityType);
                     scenarios.setScenarioTriggered(scenario, true);
-                    // TODO: Trigger scenario handler
-                    WarningAction warningAction = new WarningAction(context);
-                    warningAction.SendNotifications();
+                    // Trigger scenario handler
+                    if (scenario == Scenarios.Scenario.SCENARIO_MUSIC)
+                        new WarningAction(context).sendNotification();
+                    else if (scenario == Scenarios.Scenario.SCENARIO_WARNING)
+                        new WarningAction(context).sendNotification();
+                    else if (scenario == Scenarios.Scenario.SCENARIO_HOME)
+                        new HomeAction(context).sendNotification();
                 }
             }
         }

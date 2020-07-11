@@ -26,14 +26,20 @@ import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private DetectedLocationService locationService;
     private DetectedActivitiesService activitiesService;
+    private boolean shouldRefreshLocationService = false;
+    private boolean shouldRefreshActivityService = false;
     protected ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
             locationService = ((DetectedLocationService.LocalBinder) binder).getService();
+            if (shouldRefreshLocationService) {
+                locationService.startTracking();
+                shouldRefreshLocationService = false;
+            }
         }
 
         @Override
@@ -46,6 +52,10 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
             activitiesService = ((DetectedActivitiesService.LocalBinder) binder).getService();
+            if (shouldRefreshActivityService) {
+                activitiesService.startTracking();
+                shouldRefreshActivityService = false;
+            }
         }
 
         @Override
@@ -104,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void requestLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.e(TAG, "Necessary permission to access location is not granted. Location updates cannot be processed.");
+            Log.e(LOG_TAG, "Necessary permission to access location is not granted. Location updates cannot be processed.");
             return;
         }
         if (locationService != null) {
@@ -127,6 +137,19 @@ public class MainActivity extends AppCompatActivity {
     public void removeActivityUpdates() {
         if (activitiesService != null) {
             activitiesService.stopTracking();
+        }
+    }
+
+    public void refreshServices() {
+        if (locationService != null) {
+            locationService.startTracking();
+        } else {
+            shouldRefreshLocationService = true;
+        }
+        if (activitiesService != null) {
+            activitiesService.startTracking();
+        } else {
+            shouldRefreshActivityService = true;
         }
     }
 }

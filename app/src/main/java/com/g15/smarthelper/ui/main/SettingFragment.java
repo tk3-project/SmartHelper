@@ -223,6 +223,11 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         if (scenarios.isScenarioActivated(Scenarios.Scenario.SCENARIO_HOME)) {
             homeSwitch.setChecked(true);
         }
+
+        if (scenarios.isAnyScenarioEnabled()) {
+            Log.i(LOG_TAG, "Refreshing services.");
+            ((MainActivity)getActivity()).refreshServices();
+        }
     }
 
     @Override

@@ -10,6 +10,8 @@ import android.util.Log;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.g15.smarthelper.Constants;
+import com.g15.smarthelper.ScenarioHandler.HomeAction;
+import com.g15.smarthelper.ScenarioHandler.MusicAction;
 import com.g15.smarthelper.ScenarioHandler.WarningAction;
 import com.g15.smarthelper.Scenarios;
 import com.google.android.gms.location.LocationResult;
@@ -68,9 +70,13 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
             if (!wasInGeofenceBefore && isInFence && targetActivity == currentActivity) {
                 Log.i(LOG_TAG, "Scenario " + scenario + " was triggered at location: " + location);
                 scenarios.setScenarioTriggered(scenario, true);
-                // TODO: Trigger scenario handler
-                WarningAction warningAction = new WarningAction(context);
-                warningAction.SendNotifications();
+                // Trigger scenario handler
+                if (scenario == Scenarios.Scenario.SCENARIO_MUSIC)
+                    new MusicAction(context).sendNotification();
+                else if (scenario == Scenarios.Scenario.SCENARIO_WARNING)
+                    new WarningAction(context).sendNotification();
+                else if (scenario == Scenarios.Scenario.SCENARIO_HOME)
+                    new HomeAction(context).sendNotification();
             } else if (wasInGeofenceBefore && !isInFence) {
                 scenarios.setScenarioTriggered(scenario, false);
                 Log.i(LOG_TAG, "Scenario " + scenario + " was left.");

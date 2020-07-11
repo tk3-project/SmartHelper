@@ -26,6 +26,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.g15.smarthelper.Constants;
+import com.g15.smarthelper.MainActivity;
 import com.g15.smarthelper.R;
 import com.g15.smarthelper.Scenarios;
 import com.g15.smarthelper.receiver.LocationUpdateReceiver;
@@ -189,11 +190,16 @@ public class DetectedLocationService extends Service {
 
     private Notification createForegroundNotification () {
         Log.v(LOG_TAG, "Creating foreground notification.");
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentText(getString(R.string.foreground_service_msg))
                 .setContentTitle(getString(R.string.foreground_service_title))
                 .setOngoing(true)
                 .setPriority(Notification.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setWhen(System.currentTimeMillis());
 
