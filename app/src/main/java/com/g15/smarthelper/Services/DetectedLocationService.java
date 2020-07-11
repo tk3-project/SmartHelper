@@ -123,7 +123,7 @@ public class DetectedLocationService extends Service {
     public boolean onUnbind(Intent intent) {
         Log.v(LOG_TAG, "Unbound from DetectedLocationService");
         if (isActive) {
-        startForeground(NOTIFICATION_ID, createForegroundNotification());
+            startForeground(NOTIFICATION_ID, createForegroundNotification());
         }
         return true;
     }
@@ -154,6 +154,7 @@ public class DetectedLocationService extends Service {
 
     public void stopTracking() {
         Log.i(LOG_TAG, "Stopping location tracking.");
+        isActive = false;
         fusedLocationClient.removeLocationUpdates(getPendingIntent());
         fusedLocationClient.removeLocationUpdates(getBroadcastPendingIntent());
     }
