@@ -294,23 +294,4 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
     private void setScenarioEnabled(Scenarios.Scenario scenario, boolean scenarioActivated) {
         scenarios.setScenarioEnabled(scenario, scenarioActivated);
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(activityReceiver,
-                new IntentFilter(Constants.BROADCAST_DETECTED_ACTIVITY));
-
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(locationReceiver,
-                new IntentFilter(Constants.BROADCAST_DETECTED_ACTIVITY));
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(activityReceiver);
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(locationReceiver);
-    }
 }
