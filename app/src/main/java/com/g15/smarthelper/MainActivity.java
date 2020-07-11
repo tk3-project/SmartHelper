@@ -113,12 +113,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        /*if (locationService != null) {
+        if (locationService != null) {
             unbindService(serviceConnection);
         }
         if (activitiesService != null) {
             unbindService(serviceConnection2);
-        }*/
+        }
         super.onStop();
     }
 
