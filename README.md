@@ -1,9 +1,20 @@
 # SmartHelper
 
+## Specification
+
+* use `Broadcasteceiver` to fetch and broadcast the activity and location results.
+
+
 ## ChangeLog
+* display default activity and location information when no results obtained.
+
+
+* Remove `IntentService	`, use `Receiver` to fetch and broadcast the activity and location results.
+* Enable background services.
+
+
+* Enable display Location in DisplayFragement
 * Add `enableLocationAndActivityTracking` and `disableLocationAndActivityTracking` methods in SettingFragment
-
-
 * Add new Services
 * Rename some files
 * Change the structure of the project
@@ -15,7 +26,6 @@
         |-- AndroidManifest.xml
     |-- java
         |-- Services
-            |-- DetectedActvitiesIntentService.java
             |-- DetectedActvitiesService.java
             |-- DetectedLocationService.java
         |-- ui.main

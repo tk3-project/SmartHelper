@@ -46,12 +46,12 @@ import static com.g15.smarthelper.Scenarios.SHARED_PREFERENCES_KEY;
 public class DetectedLocationService extends Service {
 
     private static final String LOG_TAG = "DetectedLocationService";
+    private static final String CHANNEL_ID = "foreground-service-notifications";
     private static final int NOTIFICATION_ID = 9213875;
 
-    private Intent nIntentService;
-    private PendingIntent nPendingIntent;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationRequest locationRequest;
+    private boolean isActive = false;
 
     private final IBinder locBinder = new LocalBinder();
 
@@ -63,65 +63,36 @@ public class DetectedLocationService extends Service {
 
     @Override
     public void onCreate() {
-
-        Log.i(LOG_TAG, "Location service created");
+        Log.i(LOG_TAG, "Detected Location Service created.");
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        nIntentService = new Intent(this, FetchAddressIntentService.class);
-        nPendingIntent = PendingIntent.getService(this, 1, nIntentService, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        createLocationRequest();
 
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(
                 SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
         final Scenarios scenarios = new Scenarios(sharedPreferences);
 
-        /*locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                Log.i(LOG_TAG, "Foreground location service fetched new location.");
-                List<Location> detectedLocations = locationResult.getLocations();
-                for (Location location : detectedLocations) {
-                    Log.i(LOG_TAG, "Detected locations: " + location);
-                    broadcastLocation(location);
-                    LocationUpdateReceiver.processLocationUpdate(
-                    getApplicationContext(), scenarios, location);
-                }
-            }
-        };*/
-
+        createLocationRequest();
         fetchLocation();
 
         HandlerThread handlerThread = new HandlerThread(LOG_TAG);
         handlerThread.start();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.app_name);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
+
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     private void fetchLocation() {
-        /*try {
+        try {
             Log.v(LOG_TAG, "Fetching latest location.");
             fusedLocationClient.getLastLocation();
         } catch (SecurityException ex) {
             Log.e(LOG_TAG, "Lost location permission.", ex);
-        }*/
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
         }
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            //lLat = location.getLatitude();
-                            //lLong = location.getLongitude();
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e(LOG_TAG, "Lost location permission." + e);
-                    }
-                });
     }
 
     private void createLocationRequest() {
@@ -144,62 +115,92 @@ public class DetectedLocationService extends Service {
     @Override
     public void onRebind(Intent intent) {
         Log.v(LOG_TAG, "Re-Bound to DetectedLocationService");
-        //stopForeground(true);
+        stopForeground(true);
         super.onRebind(intent);
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
         Log.v(LOG_TAG, "Unbound from DetectedLocationService");
-        //if (isActive) {
-        //startForeground(NOTIFICATION_ID, createForegroundNotification());
-        //}
+        if (isActive) {
+            startForeground(NOTIFICATION_ID, createForegroundNotification());
+        }
         return true;
     }
 
-    private PendingIntent getPendingIntent() {
-        Intent intent = new Intent(this, FetchAddressIntentService.class);
-        intent.setAction(Constants.ACTION_PROCESS_UPDATES);
-        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    private PendingIntent getBroadcastPendingIntent() {
+        Intent intent = new Intent(this, LocationUpdateReceiver.class);
+        return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
 
     public void startTracking() {
         Log.i(LOG_TAG, "Starting location tracking.");
         startService(new Intent(getApplicationContext(), DetectedLocationService.class));
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+        try {
+            fusedLocationClient.requestLocationUpdates(locationRequest, getBroadcastPendingIntent())
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void result) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Successfully requested location updates",
+                                    Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Requesting location updates failed to start",
+                                    Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+                    });
+            isActive = true;
+        } catch (SecurityException ex) {
+            Log.e(LOG_TAG, "Location permission denied.", ex);
         }
-        Task<Void> task = fusedLocationClient.requestLocationUpdates(locationRequest, getPendingIntent());
-        task.addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void result) {
-                Toast.makeText(getApplicationContext(),
-                        "Successfully requested location updates",
-                        Toast.LENGTH_SHORT)
-                        .show();
-            }
-        });
-
-        task.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(),
-                        "Requesting location updates failed to start",
-                        Toast.LENGTH_SHORT)
-                        .show();
-            }
-        });
     }
 
     public void stopTracking() {
         Log.i(LOG_TAG, "Stopping location tracking.");
-        fusedLocationClient.removeLocationUpdates(getPendingIntent());
+        isActive = false;
+        fusedLocationClient.removeLocationUpdates(getBroadcastPendingIntent())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        Toast.makeText(getApplicationContext(),
+                                "Successfully removed location updates",
+                                Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(),
+                                "Removing location updates failed to start",
+                                Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                });
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        stopTracking();
+    private Notification createForegroundNotification () {
+        Log.v(LOG_TAG, "Creating foreground notification.");
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setContentText(getString(R.string.foreground_service_msg))
+                .setContentTitle(getString(R.string.foreground_service_title))
+                .setOngoing(true)
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setWhen(System.currentTimeMillis());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder.setChannelId(CHANNEL_ID);
+        }
+
+        return builder.build();
     }
 }

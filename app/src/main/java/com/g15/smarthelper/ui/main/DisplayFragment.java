@@ -34,6 +34,7 @@ public class DisplayFragment extends Fragment {
 
     private TextView txtActivity, txtLocation;
     private ImageView imgActivity;
+    private String default_loc, default_act;
 
     @Override
     public View onCreateView(
@@ -46,9 +47,15 @@ public class DisplayFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        default_loc = getString(R.string.location_unknown);
+        default_act = getString(R.string.activity_unknown);
+
         txtActivity = getActivity().findViewById(R.id.txt_activity);
         txtLocation = getActivity().findViewById(R.id.txt_location);
         imgActivity = getActivity().findViewById(R.id.img_activity);
+
+        txtLocation.setText("Location: " + default_loc);
+        txtActivity.setText("Activity: " + default_act);
     }
 
     @Override
@@ -59,9 +66,8 @@ public class DisplayFragment extends Fragment {
             @Override
             public void onReceive(Context context, Intent intent) {
                 int type = intent.getIntExtra("type", -1);
-                int confidence = intent.getIntExtra("confidence", 0);
-                Log.i(LOG_TAG, "Broadcast: Activity received, Type = " + type + ", Confidence = " + confidence);
-                handleUserActivity(type, confidence);
+                Log.i(LOG_TAG, "Broadcast: Activity received, Type = " + type);
+                handleUserActivity(type);
             }
         };
 
@@ -80,7 +86,7 @@ public class DisplayFragment extends Fragment {
         txtLocation.setText(location);
     }
 
-    private void handleUserActivity(int type, int confidence) {
+    private void handleUserActivity(int type) {
         String label = getString(R.string.activity_unknown);
         int icon = R.drawable.ic_still;
 
@@ -125,17 +131,15 @@ public class DisplayFragment extends Fragment {
             }
         }
 
-        Log.e(LOG_TAG, "User activity: " + label + ", Confidence: " + confidence);
+        Log.e(LOG_TAG, "User activity: " + label);
 
-        if (confidence > Constants.CONFIDENCE) {
-            txtActivity.setText(label);
-            imgActivity.setImageResource(icon);
-        }
+        txtActivity.setText(label);
+        imgActivity.setImageResource(icon);
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
 
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(activityReceiver,
                 new IntentFilter(Constants.BROADCAST_DETECTED_ACTIVITY));
@@ -144,8 +148,8 @@ public class DisplayFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDestroy() {
+        super.onDestroy();
 
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(activityReceiver);
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(locationReceiver);
