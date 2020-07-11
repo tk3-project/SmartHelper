@@ -1,12 +1,15 @@
 package com.g15.smarthelper.Services;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Build;
@@ -14,9 +17,13 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.g15.smarthelper.Constants;
 import com.g15.smarthelper.R;
@@ -27,27 +34,32 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import static com.g15.smarthelper.Scenarios.SHARED_PREFERENCES_KEY;
 
 public class DetectedLocationService extends Service {
 
     private static final String LOG_TAG = "DetectedLocationService";
-    private static final String CHANNEL_ID = "foreground-service-notifications";
     private static final int NOTIFICATION_ID = 9213875;
 
-    private final IBinder serviceBinder = new IdentityBinder();
-
-    public class IdentityBinder extends Binder {
-        public DetectedLocationService getService() { return DetectedLocationService.this; }
-    }
-
+    private Intent nIntentService;
+    private PendingIntent nPendingIntent;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationRequest locationRequest;
-    private LocationCallback locationCallback;
-    private boolean isActive = false;
+
+    private final IBinder locBinder = new LocalBinder();
+
+    public class LocalBinder extends Binder {
+        public DetectedLocationService getService() {
+            return DetectedLocationService.this;
+        }
+    }
 
     @Override
     public void onCreate() {
@@ -55,45 +67,61 @@ public class DetectedLocationService extends Service {
         Log.i(LOG_TAG, "Location service created");
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        nIntentService = new Intent(this, FetchAddressIntentService.class);
+        nPendingIntent = PendingIntent.getService(this, 1, nIntentService, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        createLocationRequest();
 
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(
                 SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
         final Scenarios scenarios = new Scenarios(sharedPreferences);
 
-        locationCallback = new LocationCallback() {
+        /*locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 Log.i(LOG_TAG, "Foreground location service fetched new location.");
-                List<Location> locations = locationResult.getLocations();
-                for (Location location : locations) {
+                List<Location> detectedLocations = locationResult.getLocations();
+                for (Location location : detectedLocations) {
+                    Log.i(LOG_TAG, "Detected locations: " + location);
+                    broadcastLocation(location);
                     LocationUpdateReceiver.processLocationUpdate(
-                            getApplicationContext(), scenarios, location);
+                    getApplicationContext(), scenarios, location);
                 }
             }
-        };
+        };*/
 
-        createLocationRequest();
         fetchLocation();
 
         HandlerThread handlerThread = new HandlerThread(LOG_TAG);
         handlerThread.start();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.app_name);
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
-
-            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            notificationManager.createNotificationChannel(channel);
-        }
     }
 
     private void fetchLocation() {
-        try {
+        /*try {
             Log.v(LOG_TAG, "Fetching latest location.");
             fusedLocationClient.getLastLocation();
         } catch (SecurityException ex) {
             Log.e(LOG_TAG, "Lost location permission.", ex);
+        }*/
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
         }
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (location != null) {
+                            //lLat = location.getLatitude();
+                            //lLong = location.getLongitude();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(LOG_TAG, "Lost location permission." + e);
+                    }
+                });
     }
 
     private void createLocationRequest() {
@@ -101,7 +129,7 @@ public class DetectedLocationService extends Service {
         locationRequest = new LocationRequest()
                 .setInterval(Constants.UPDATE_INTERVAL)
                 .setFastestInterval(Constants.FASTEST_UPDATE_INTERVAL)
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY)
                 .setMaxWaitTime(Constants.MAX_WAIT_TIME);
     }
 
@@ -110,57 +138,68 @@ public class DetectedLocationService extends Service {
     public IBinder onBind(Intent intent) {
         Log.v(LOG_TAG, "Bound to DetectedLocationService");
         stopForeground(true);
-        return serviceBinder;
+        return locBinder;
     }
 
     @Override
     public void onRebind(Intent intent) {
         Log.v(LOG_TAG, "Re-Bound to DetectedLocationService");
-        stopForeground(true);
+        //stopForeground(true);
         super.onRebind(intent);
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
         Log.v(LOG_TAG, "Unbound from DetectedLocationService");
-        if (isActive) {
-            startForeground(NOTIFICATION_ID, createForegroundNotification());
-        }
+        //if (isActive) {
+        //startForeground(NOTIFICATION_ID, createForegroundNotification());
+        //}
         return true;
     }
+
+    private PendingIntent getPendingIntent() {
+        Intent intent = new Intent(this, FetchAddressIntentService.class);
+        intent.setAction(Constants.ACTION_PROCESS_UPDATES);
+        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
 
     public void startTracking() {
         Log.i(LOG_TAG, "Starting location tracking.");
         startService(new Intent(getApplicationContext(), DetectedLocationService.class));
-        try {
-            fusedLocationClient.requestLocationUpdates(locationRequest,
-                    locationCallback, Looper.myLooper());
-            isActive = true;
-        } catch (SecurityException ex) {
-            Log.e(LOG_TAG, "Location permission denied.", ex);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
         }
+        Task<Void> task = fusedLocationClient.requestLocationUpdates(locationRequest, getPendingIntent());
+        task.addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                Toast.makeText(getApplicationContext(),
+                        "Successfully requested location updates",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+        });
+
+        task.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(),
+                        "Requesting location updates failed to start",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+        });
     }
 
     public void stopTracking() {
         Log.i(LOG_TAG, "Stopping location tracking.");
-        isActive = false;
-        fusedLocationClient.removeLocationUpdates(locationCallback);
+        fusedLocationClient.removeLocationUpdates(getPendingIntent());
     }
 
-    private Notification createForegroundNotification () {
-        Log.v(LOG_TAG, "Creating foreground notification.");
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setContentText(getString(R.string.foreground_service_msg))
-                .setContentTitle(getString(R.string.foreground_service_title))
-                .setOngoing(true)
-                .setPriority(Notification.PRIORITY_HIGH)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setWhen(System.currentTimeMillis());
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder.setChannelId(CHANNEL_ID);
-        }
-
-        return builder.build();
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopTracking();
     }
 }

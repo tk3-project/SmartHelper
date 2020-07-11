@@ -30,6 +30,8 @@ import com.g15.smarthelper.R;
 import com.g15.smarthelper.ScenarioHandler.WarningAction;
 import com.g15.smarthelper.Scenarios;
 import com.g15.smarthelper.Services.DetectedActivitiesService;
+import com.g15.smarthelper.receiver.ActivityUpdateReceiver;
+import com.g15.smarthelper.receiver.LocationUpdateReceiver;
 import com.google.android.gms.location.DetectedActivity;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -44,6 +46,9 @@ import static com.g15.smarthelper.Scenarios.SHARED_PREFERENCES_KEY;
 public class SettingFragment extends Fragment implements CompoundButton.OnCheckedChangeListener {
 
     private static String LOG_TAG = "settings-fragment";
+
+    ActivityUpdateReceiver activityReceiver = new ActivityUpdateReceiver();
+    LocationUpdateReceiver locationReceiver = new LocationUpdateReceiver();
 
     private Switch musicSwitch;
     private Switch warningSwitch;
@@ -288,5 +293,24 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
      */
     private void setScenarioEnabled(Scenarios.Scenario scenario, boolean scenarioActivated) {
         scenarios.setScenarioEnabled(scenario, scenarioActivated);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(activityReceiver,
+                new IntentFilter(Constants.BROADCAST_DETECTED_ACTIVITY));
+
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(locationReceiver,
+                new IntentFilter(Constants.BROADCAST_DETECTED_ACTIVITY));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(activityReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(locationReceiver);
     }
 }

@@ -19,13 +19,14 @@ import com.google.android.gms.tasks.Task;
 
 
 public class DetectedActivitiesService extends Service{
-    private static final String LOG_TAG = DetectedActivitiesService.class.getSimpleName();
+
+    private static final String LOG_TAG = "DetectedActivityService";
 
     private Intent mIntentService;
     private PendingIntent mPendingIntent;
     private ActivityRecognitionClient mActivityRecognitionClient;
 
-    private final IBinder mBinder = new LocalBinder();
+    private final IBinder actBinder = new LocalBinder();
 
     public class LocalBinder extends Binder {
         public DetectedActivitiesService getService() {
@@ -44,12 +45,11 @@ public class DetectedActivitiesService extends Service{
 
     }
 
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         Log.v(LOG_TAG, "Bound to DetectedActivitiesService");
-        return mBinder;
+        return actBinder;
     }
 
     @Override
