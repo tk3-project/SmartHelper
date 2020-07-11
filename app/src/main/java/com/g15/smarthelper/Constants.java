@@ -11,15 +11,17 @@ public class Constants {
     public static final int CONFIDENCE = 70;
 
     // Location
+    public static final String BROADCAST_DETECTED_LOCATION = "location_intent";
     public static final String ADDRESS_REQUESTED_KEY = "address-request-pending";
     public static final String LOCATION_ADDRESS_KEY = "location-address";
-    public static final long UPDATE_INTERVAL = 20000; // 20 sec
-    public static final long FASTEST_UPDATE_INTERVAL = 10000; // 10 sec
+    public static final long UPDATE_INTERVAL = 10000; // 20 sec
+    public static final long FASTEST_UPDATE_INTERVAL = 5000; // 10 sec
     public static final long MAX_WAIT_TIME = UPDATE_INTERVAL * 4; // 80 sec
     public static final int SUCCESS_RESULT = 0;
     public static final int FAILURE_RESULT = 1;
     public static final String RECEIVER = PACKAGE_NAME + ".RECEIVER";
     public static final String RESULT_DATA_KEY = PACKAGE_NAME + ".RESULT_DATA_KEY";
     public static final String LOCATION_DATA_EXTRA = PACKAGE_NAME + ".LOCATION_DATA_EXTRA";
+    public static final String ACTION_PROCESS_UPDATES = PACKAGE_NAME + ".PROCESS_UPDATES";
 
 }

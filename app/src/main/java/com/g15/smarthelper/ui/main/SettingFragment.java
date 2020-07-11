@@ -30,6 +30,8 @@ import com.g15.smarthelper.R;
 import com.g15.smarthelper.ScenarioHandler.WarningAction;
 import com.g15.smarthelper.Scenarios;
 import com.g15.smarthelper.Services.DetectedActivitiesService;
+import com.g15.smarthelper.receiver.ActivityUpdateReceiver;
+import com.g15.smarthelper.receiver.LocationUpdateReceiver;
 import com.google.android.gms.location.DetectedActivity;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -45,6 +47,9 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
 
     private static String LOG_TAG = "settings-fragment";
 
+    ActivityUpdateReceiver activityReceiver = new ActivityUpdateReceiver();
+    LocationUpdateReceiver locationReceiver = new LocationUpdateReceiver();
+
     private Switch musicSwitch;
     private Switch warningSwitch;
     private Switch homeSwitch;
@@ -53,11 +58,6 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
     private CompoundButton currentTargetSwitch;
     private List<String> missingPermissions = new ArrayList<>();
     private int permissionCounter = 0;
-
-    WarningAction warningAction;
-    BroadcastReceiver mReceiver;
-    LocalBroadcastManager broadcastManager;
-    IntentFilter intentFilter;
 
     @Override
     public View onCreateView(
@@ -76,7 +76,6 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         SharedPreferences sharedPreferences = getActivity()
                 .getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
         scenarios = new Scenarios(sharedPreferences);
-        warningAction = new WarningAction(getContext());
 
         initializeScenarioActivated();
 
@@ -106,6 +105,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
 
     /**
      * Checks which of the necessary permissions are granted.
+     *
      * @return A list of permission identifiers that are not granted, but needed.
      */
     private String[] identifyNeededPermissions() {
@@ -128,6 +128,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
 
     /**
      * Checks if all needed permissions are granted.
+     *
      * @return true if all permissions are granted, otherwise false.
      */
     private boolean checkPermissions() {
@@ -176,7 +177,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         if (missingPermissions.size() > 0) {
             String permission = missingPermissions.remove(0);
             Log.d(LOG_TAG, "Requesting missing permission: " + permission);
-            requestPermissions(new String[] {permission}, ++permissionCounter);
+            requestPermissions(new String[]{permission}, ++permissionCounter);
         }
     }
 
@@ -194,7 +195,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
             // The permissions have to be requested individually to work on Android 10.
             String permission = missingPermissions.remove(0);
             Log.d(LOG_TAG, "Requesting missing permission: " + permission);
-            requestPermissions(new String[] {permission}, ++permissionCounter);
+            requestPermissions(new String[]{permission}, ++permissionCounter);
         } else {
             Log.i(LOG_TAG, "All needed permissions granted.");
             if (currentTargetScenario != null) {
@@ -234,21 +235,12 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         if (compoundButton == musicSwitch) {
             Log.i(LOG_TAG, "Music scenario state changed to: " + scenarioActivated);
             currentScenario = Scenarios.Scenario.SCENARIO_MUSIC;
-            if (scenarioActivated){
-                //TODO
-            }
         } else if (compoundButton == warningSwitch) {
             Log.i(LOG_TAG, "Warning scenario state changed to: " + scenarioActivated);
             currentScenario = Scenarios.Scenario.SCENARIO_WARNING;
-            if (scenarioActivated){
-                //MonitorWarningCondition();
-            }
         } else if (compoundButton == homeSwitch) {
             Log.i(LOG_TAG, "Home scenario state changed to: " + scenarioActivated);
             currentScenario = Scenarios.Scenario.SCENARIO_HOME;
-            if (scenarioActivated){
-                //TODO
-            }
         } else {
             Log.w(LOG_TAG, "Invalid scenario change triggered.");
             return;
@@ -280,8 +272,6 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
      */
     private void enableLocationAndActivityTracking() {
         Log.i(LOG_TAG, "Start activity and location tracking.");
-        Intent intent = new Intent(getActivity(), DetectedActivitiesService.class);
-        getContext().startService(intent);
         ((MainActivity) getActivity()).requestLocationUpdates();
         ((MainActivity) getActivity()).requestActivityUpdates();
     }
@@ -291,48 +281,36 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
      */
     private void disableLocationAndActivityTracking() {
         Log.i(LOG_TAG, "Stop activity and location tracking.");
-        Intent intent = new Intent(getActivity(), DetectedActivitiesService.class);
-        getContext().stopService(intent);
         ((MainActivity) getActivity()).removeLocationUpdates();
         ((MainActivity) getActivity()).removeActivityUpdates();
     }
 
     /**
      * This method changes the activation state of a scenario.
-     * @param scenario The scenario to change.
+     *
+     * @param scenario          The scenario to change.
      * @param scenarioActivated If the scenario should be enabled or disabled.
      */
     private void setScenarioEnabled(Scenarios.Scenario scenario, boolean scenarioActivated) {
         scenarios.setScenarioEnabled(scenario, scenarioActivated);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
 
-    // Process warning scenario here
-    private void MonitorWarningCondition(){
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(activityReceiver,
+                new IntentFilter(Constants.BROADCAST_DETECTED_ACTIVITY));
 
-        broadcastManager = LocalBroadcastManager.getInstance(getActivity());
-        intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.BROADCAST_DETECTED_ACTIVITY);
-        mReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                int type = intent.getIntExtra("type", -1);
-                int confidence = intent.getIntExtra("confidence", 0);
-                Log.i(LOG_TAG, "Broadcast: Activity received, Type = " + type + ", Confidence = " + confidence);
-                if (type == DetectedActivity.ON_FOOT || type == DetectedActivity.WALKING){
-                    if (confidence > Constants.CONFIDENCE) {
-                        warningAction.SendNotifications();
-                    }
-                }
-            }
-        };
-
-        broadcastManager.registerReceiver(mReceiver, intentFilter);
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(locationReceiver,
+                new IntentFilter(Constants.BROADCAST_DETECTED_ACTIVITY));
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        //broadcastManager.unregisterReceiver(mReceiver);
+    public void onPause() {
+        super.onPause();
+
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(activityReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(locationReceiver);
     }
 }

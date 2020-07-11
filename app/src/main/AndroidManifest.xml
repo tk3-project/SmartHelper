@@ -27,7 +27,7 @@
         <receiver
             android:name=".receiver.ActivityUpdateReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true"/>
 
         <receiver
             android:name=".receiver.LocationUpdateReceiver"

@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.ResultReceiver;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,18 +19,21 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.g15.smarthelper.R;
 import com.g15.smarthelper.Constants;
+
+import com.g15.smarthelper.receiver.ActivityUpdateReceiver;
+import com.g15.smarthelper.receiver.LocationUpdateReceiver;
+
 import com.google.android.gms.location.DetectedActivity;
 
 
 public class DisplayFragment extends Fragment {
 
     private static String LOG_TAG = "display-fragment";
-    BroadcastReceiver broadcastReceiver;
-    ResultReceiver mResultReceiver;
+    ActivityUpdateReceiver activityReceiver;
+    LocationUpdateReceiver locationReceiver;
 
     private TextView txtActivity, txtLocation;
     private ImageView imgActivity;
-    private String mAddressOutput;
 
     @Override
     public View onCreateView(
@@ -54,33 +55,32 @@ public class DisplayFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mResultReceiver = new ResultReceiver(new Handler()){
+        activityReceiver = new ActivityUpdateReceiver() {
             @Override
-            public void onReceiveResult(int resultCode, Bundle resultData){
-                mAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
-                handleUserLocation(mAddressOutput);
+            public void onReceive(Context context, Intent intent) {
+                int type = intent.getIntExtra("type", -1);
+                int confidence = intent.getIntExtra("confidence", 0);
+                Log.i(LOG_TAG, "Broadcast: Activity received, Type = " + type + ", Confidence = " + confidence);
+                handleUserActivity(type, confidence);
             }
         };
 
-
-        broadcastReceiver = new BroadcastReceiver() {
+        locationReceiver = new LocationUpdateReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(Constants.BROADCAST_DETECTED_ACTIVITY)) {
-                    int type = intent.getIntExtra("type", -1);
-                    int confidence = intent.getIntExtra("confidence", 0);
-                    Log.i(LOG_TAG, "Broadcast: Activity received, Type = " + type + ", Confidence = " + confidence);
-                    handleUserActivity(type, confidence);
-                }
+                double latitude = intent.getDoubleExtra("latitude", 0);
+                double longtitude = intent.getDoubleExtra("longtitude", 0);
+                Log.i(LOG_TAG, "Broadcast: Location received, latitude = " + latitude + "; longtitude = " + longtitude);
+                handleUserLocation(latitude, longtitude);
             }
         };
     }
-    private void handleUserLocation(String Location){
-        txtLocation.setText(Location);
+    private void handleUserLocation(double Lat, double Long){
+        String location = "Lat: " + Lat + "; Long: " + Long;
+        txtLocation.setText(location);
     }
 
     private void handleUserActivity(int type, int confidence) {
-        //Log.i(LOG_TAG, "handleUserActivity" + type);
         String label = getString(R.string.activity_unknown);
         int icon = R.drawable.ic_still;
 
@@ -134,17 +134,20 @@ public class DisplayFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
 
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(broadcastReceiver,
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(activityReceiver,
                 new IntentFilter(Constants.BROADCAST_DETECTED_ACTIVITY));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(locationReceiver,
+                new IntentFilter(Constants.BROADCAST_DETECTED_LOCATION));
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDestroy() {
+        super.onDestroy();
 
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(activityReceiver);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(locationReceiver);
     }
 }

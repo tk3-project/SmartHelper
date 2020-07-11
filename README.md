@@ -1,6 +1,7 @@
 # SmartHelper
 
 ## ChangeLog
+* Enable display Location in DisplayFragement
 * Add `enableLocationAndActivityTracking` and `disableLocationAndActivityTracking` methods in SettingFragment
 
 
