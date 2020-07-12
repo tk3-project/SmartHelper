@@ -60,4 +60,16 @@
     <string name="home_notification_title">It\'s getting late.</string>
     <string name="home_notification_text">Prepare for good sleep by enabling the night mode on your smartphone.</string>
 
+    <!-- Location Selection -->
+    <string name="location_selection_title">Select Scenario Locations</string>
+    <string name="music_location_label">Music Assistant Location</string>
+    <string name="home_location_label">Home Assistant Location</string>
+    <string name="warning_location_label">Warning Assistant Location</string>
+    <string name="location_lat_label">Latitude</string>
+    <string name="location_lng_label">Longitude</string>
+    <string name="location_radius_label">Radius [m]</string>
+    <string name="update_location_btn">Save</string>
+    <string name="location_selection_loading">-</string>
+    <string name="location_update_failed_toast">The provided values are not valid. Please enter valid numbers.</string>
+
 </resources>

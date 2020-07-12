@@ -87,21 +87,27 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
      * Set the location of the scenarios.
      */
     private void setInitialLocation() {
-        Log.v(LOG_TAG, "Initializing scenario locations.");
-        double herrnGartenLat = 49.8775;
-        double herrnGartenLng = 8.6525;
-        int herrnGartenRadius = 150; // in meters
-        scenarios.setScenarioFence(Scenarios.Scenario.SCENARIO_MUSIC, herrnGartenLat, herrnGartenLng, herrnGartenRadius);
+        if (scenarios.getScenariosInitialized()) {
+            Log.i(LOG_TAG, "Initializing scenario locations with default values.");
+            double herrnGartenLat = 49.8775;
+            double herrnGartenLng = 8.6525;
+            int herrnGartenRadius = 150; // in meters
+            scenarios.setScenarioFence(Scenarios.Scenario.SCENARIO_MUSIC, herrnGartenLat, herrnGartenLng, herrnGartenRadius);
 
-        double homeLat = 49.8727;
-        double homeLng = 8.6312;
-        int homeRadius = 50; // in meters
-        scenarios.setScenarioFence(Scenarios.Scenario.SCENARIO_HOME, homeLat, homeLng, homeRadius);
+            double homeLat = 49.8727;
+            double homeLng = 8.6312;
+            int homeRadius = 50; // in meters
+            scenarios.setScenarioFence(Scenarios.Scenario.SCENARIO_HOME, homeLat, homeLng, homeRadius);
 
-        double warningLat = 49.8521;
-        double warningLng = 8.6463;
-        int warningRadius = 50; // in meters
-        scenarios.setScenarioFence(Scenarios.Scenario.SCENARIO_WARNING, warningLat, warningLng, warningRadius);
+            double warningLat = 49.8521;
+            double warningLng = 8.6463;
+            int warningRadius = 50; // in meters
+            scenarios.setScenarioFence(Scenarios.Scenario.SCENARIO_WARNING, warningLat, warningLng, warningRadius);
+
+            scenarios.initializeScenarios();
+        } else {
+            Log.v(LOG_TAG, "Scenarios already initialized.");
+        }
     }
 
     /**

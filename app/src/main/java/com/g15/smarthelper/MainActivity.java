@@ -12,7 +12,6 @@ import com.g15.smarthelper.Services.DetectedActivitiesService;
 import com.g15.smarthelper.Services.DetectedLocationService;
 import com.g15.smarthelper.ui.main.SectionsPagerAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.core.app.ActivityCompat;
@@ -87,8 +86,8 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent myIntent = new Intent(MainActivity.this, SelectLocationActivity.class);
+                startActivity(myIntent);
             }
         });
     }

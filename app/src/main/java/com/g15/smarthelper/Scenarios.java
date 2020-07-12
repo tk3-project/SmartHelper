@@ -22,6 +22,7 @@ public class Scenarios {
     private static final String LOG_TAG = "scenarios";
     public static final String SHARED_PREFERENCES_KEY = "scenarios-shared-preferences";
     private static final String CURRENT_ACTIVITY = "current_activity";
+    private static final String SCENARIOS_INITIALIZED = "scenarios_initialized";
     private static final String SCENARIO_TRIGGERED_FORMAT = "scenario%1$s_triggered";
     private static final String SCENARIO_ACTIVATED_FORMAT = "scenario%1$s_activated";
     private static final String SCENARIO_GEOFENCE_ENTERED_FORMAT = "scenario%1$s_geofence_entered";
@@ -232,6 +233,16 @@ public class Scenarios {
         } else {
             return sharedPreferences.getInt(radiusName, 0);
         }
+    }
+
+    public void initializeScenarios() {
+        sharedPreferences.edit()
+                .putBoolean(SCENARIOS_INITIALIZED, true)
+                .commit();
+    }
+
+    public boolean getScenariosInitialized() {
+        return sharedPreferences.getBoolean(SCENARIOS_INITIALIZED, false);
     }
 
 }

@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SelectLocationActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Music Location Selection-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/music_location_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="sans-serif-condensed"
+                android:text="@string/music_location_label"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/music_lat_label"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/location_lat_label"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/music_lat_textfield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:text="@string/location_selection_loading" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/music_lng_label"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/location_lng_label"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/music_lng_textfield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:text="@string/location_selection_loading" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/music_radius_label"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/location_radius_label"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/music_radius_textfield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:text="@string/location_selection_loading" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Warning Location Selection-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/warning_location_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="sans-serif-condensed"
+                android:text="@string/warning_location_label"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/warning_lat_label"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/location_lat_label"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/warning_lat_textfield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:text="@string/location_selection_loading" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/warning_lng_label"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/location_lng_label"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/warning_lng_textfield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:text="@string/location_selection_loading" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/warning_radius_label"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/location_radius_label"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/warning_radius_textfield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:text="@string/location_selection_loading" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Home Location Selection-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/home_location_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="sans-serif-condensed"
+                android:text="@string/home_location_label"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/home_lat_label"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/location_lat_label"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/home_lat_textfield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:text="@string/location_selection_loading" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/home_lng_label"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/location_lng_label"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/home_lng_textfield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:text="@string/location_selection_loading" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/home_radius_label"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/location_radius_label"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/home_radius_textfield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:text="@string/location_selection_loading" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/update_location_btn" />
+
+    </LinearLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
