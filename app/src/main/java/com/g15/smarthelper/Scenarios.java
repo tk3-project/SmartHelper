@@ -209,6 +209,7 @@ public class Scenarios {
         String lngName = String.format(SCENARIO_LNG_FORMAT, scenario);
         boolean locationSet = sharedPreferences.getBoolean(locationSetName, false);
         if (!locationSet) {
+            Log.e(LOG_TAG, "Location for scenarion " + scenario + " not set.");
             return null;
         }
         double latitude = Double.longBitsToDouble(sharedPreferences.getLong(latName, 0));

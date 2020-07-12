@@ -87,7 +87,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
      * Set the location of the scenarios.
      */
     private void setInitialLocation() {
-        if (scenarios.getScenariosInitialized()) {
+        if (!scenarios.getScenariosInitialized()) {
             Log.i(LOG_TAG, "Initializing scenario locations with default values.");
             double herrnGartenLat = 49.8775;
             double herrnGartenLng = 8.6525;
