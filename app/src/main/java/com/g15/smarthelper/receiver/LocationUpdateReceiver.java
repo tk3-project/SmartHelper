@@ -16,6 +16,7 @@ import com.g15.smarthelper.ScenarioHandler.WarningAction;
 import com.g15.smarthelper.Scenarios;
 import com.google.android.gms.location.LocationResult;
 
+import java.util.Date;
 import java.util.List;
 
 import static com.g15.smarthelper.Scenarios.SHARED_PREFERENCES_KEY;
@@ -84,7 +85,12 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
 
             scenarios.setScenarioGeofenceEntered(scenario, isInFence);
 
-            if (!wasInGeofenceBefore && isInFence && targetActivity == currentActivity) {
+            Date date = new Date(location.getTime());
+            boolean isInTimeFrame = scenarios.isInTimeFrame(scenario, date);
+
+            Log.v(LOG_TAG, "Scenario " + scenario + " is in time frame: " + isInTimeFrame);
+
+            if (!wasInGeofenceBefore && isInFence && targetActivity == currentActivity && isInTimeFrame) {
                 Log.i(LOG_TAG, "Scenario " + scenario + " was triggered at location: " + location);
                 scenarios.setScenarioTriggered(scenario, true);
                 // Trigger scenario handler

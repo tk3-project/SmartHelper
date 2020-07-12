@@ -17,6 +17,7 @@ import com.g15.smarthelper.Scenarios;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 import java.util.ArrayList;
+import java.util.Date;
 
 import static com.g15.smarthelper.Constants.CONFIDENCE;
 import static com.g15.smarthelper.Scenarios.SHARED_PREFERENCES_KEY;
@@ -91,7 +92,9 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
             if (activityType != previousActivity) {
                 Log.d(LOG_TAG, "Activity changed from " + previousActivity + " to " + activityType + ".");
 
-                if (isInFence && !previouslyTriggered && targetActivity == activityType) {
+                boolean isInTimeFrame = scenarios.isInTimeFrame(scenario, new Date());
+
+                if (isInFence && !previouslyTriggered && targetActivity == activityType && isInTimeFrame) {
                     Log.i(LOG_TAG, "Scenario " + scenario + " was triggered by activity " + activityType);
                     scenarios.setScenarioTriggered(scenario, true);
                     // Trigger scenario handler

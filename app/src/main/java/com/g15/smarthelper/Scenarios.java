@@ -6,6 +6,9 @@ import android.util.Log;
 
 import com.google.android.gms.location.DetectedActivity;
 
+import java.util.Date;
+import java.util.TimeZone;
+
 /**
  * This class allows access to the activation state of the scenarios.
  * The activation states of the scenarios are stored in the shared preferences.
@@ -109,6 +112,26 @@ public class Scenarios {
             case SCENARIO_WARNING: return DetectedActivity.STILL;
         }
         return DetectedActivity.UNKNOWN;
+    }
+
+    /**
+     * Check if the date is in the time frame the scenario is active. A scenario may restrict the
+     * time frame the action can be triggered.
+     * @param scenario The scenario to specify the time span.
+     * @param date The date to check.
+     * @return If the date is in the scenario's time frame.
+     */
+    public boolean isInTimeFrame(Scenario scenario, Date date) {
+        Log.v(LOG_TAG, "Checking time frame for scenario " + scenario + " and date " + date);
+        TimeZone tz = TimeZone.getTimeZone("Europe/Berlin");
+        int tzOffset = tz.getOffset(new Date().getTime()) / 1000 / 60 / 60; // Timezone offset in hours
+        int hour = date.getHours() + tzOffset;
+        if (scenario == Scenario.SCENARIO_HOME) {
+            // Check if date is at night time
+            return hour > 22 || hour < 4;
+        } else {
+            return true;
+        }
     }
 
     /**
