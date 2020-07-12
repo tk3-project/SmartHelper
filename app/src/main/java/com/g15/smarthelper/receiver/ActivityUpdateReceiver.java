@@ -20,6 +20,12 @@ import java.util.ArrayList;
 import static com.g15.smarthelper.Constants.CONFIDENCE;
 import static com.g15.smarthelper.Scenarios.SHARED_PREFERENCES_KEY;
 
+
+/**
+ * The {@link ActivityUpdateReceiver} is a {@link BroadcastReceiver} that handles updates of the
+ * activity recognition api. New activity data is locally broadcasted and checked for matching
+ * scenario conditions.
+ */
 public class ActivityUpdateReceiver extends BroadcastReceiver {
 
     private static final String LOG_TAG = "ActivityUpdateReceiver";
@@ -54,6 +60,11 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
         }
     }
 
+    /**
+     * Broadcast a newly obtained activity update.
+     * @param activity The activity to broadcast.
+     * @param context The context to use for the broadcast.
+     */
     private void broadcastActivity(DetectedActivity activity, Context context) {
         Intent intent = new Intent(Constants.BROADCAST_DETECTED_ACTIVITY);
         intent.putExtra("type", activity.getType());
@@ -61,6 +72,12 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
         Log.i(LOG_TAG, "Locally broadcast activity update: " + activity);
     }
 
+    /**
+     * Process the activity update and trigger the scenarios if the conditions match.
+     * @param context The context of the app.
+     * @param scenarios The scenario utility to access the scenario states.
+     * @param activityType The updated activity value.
+     */
     private void processActivityUpdate(Context context, Scenarios scenarios, int activityType) {
         Scenarios.Scenario[] availableScenarios = Scenarios.Scenario.values();
         for (Scenarios.Scenario scenario : availableScenarios) {

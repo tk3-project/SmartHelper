@@ -96,6 +96,11 @@ public class Scenarios {
                 || isScenarioActivated(Scenario.SCENARIO_HOME);
     }
 
+    /**
+     * Returns the activity that a scenario is triggering at.
+     * @param scenario The selected scenario.
+     * @return The trigger activity.
+     */
     public int getTargetActivity(Scenario scenario) {
         switch (scenario) {
             case SCENARIO_HOME: return DetectedActivity.STILL;
@@ -105,6 +110,10 @@ public class Scenarios {
         return DetectedActivity.UNKNOWN;
     }
 
+    /**
+     * Stores the activity as last detected activity.
+     * @param activity The activity to store.
+     */
     public void setCurrentActivity(int activity) {
         Log.d(LOG_TAG, "Updating current activity to: " + activity);
         sharedPreferences.edit()
@@ -112,10 +121,19 @@ public class Scenarios {
                 .commit();
     }
 
+    /**
+     * Returns the last detected activity.
+     * @return The last detected activity.
+     */
     public int getCurrentActivity() {
         return sharedPreferences.getInt(CURRENT_ACTIVITY, DetectedActivity.UNKNOWN);
     }
 
+    /**
+     * Sets if the selected scenario is currently triggered.
+     * @param scenario The selected scenario.
+     * @param triggered The current trigger state.
+     */
     public void setScenarioTriggered(Scenario scenario, boolean triggered) {
         Log.v(LOG_TAG, "Scenario " + scenario + " triggered: " + triggered);
         String scenarioName = String.format(SCENARIO_TRIGGERED_FORMAT, scenario);
@@ -124,11 +142,21 @@ public class Scenarios {
                 .commit();
     }
 
+    /**
+     * Returns if the selected scenario is currently triggered.
+     * @param scenario The selected scenario.
+     * @return If the scenario is triggered.
+     */
     public boolean getScenarioTriggered(Scenario scenario) {
         String scenarioName = String.format(SCENARIO_TRIGGERED_FORMAT, scenario);
         return sharedPreferences.getBoolean(scenarioName, false);
     }
 
+    /**
+     * Stores if the corresponding geofence to the scenario is currently entered.
+     * @param scenario The selected scenario
+     * @param entered If the geofence is currently entered.
+     */
     public void setScenarioGeofenceEntered(Scenario scenario, boolean entered) {
         Log.v(LOG_TAG, "Scenario " + scenario + " geofence entered: " + entered);
         String scenarioName = String.format(SCENARIO_GEOFENCE_ENTERED_FORMAT, scenario);
@@ -137,11 +165,23 @@ public class Scenarios {
                 .commit();
     }
 
+    /**
+     * Returns if the geofence corresponding to the scenario is currently entered.
+     * @param scenario The selected scenario.
+     * @return If the geofence is currently entered.
+     */
     public boolean getScenarioGeofenceEntered(Scenario scenario) {
         String scenarioName = String.format(SCENARIO_GEOFENCE_ENTERED_FORMAT, scenario);
         return sharedPreferences.getBoolean(scenarioName, false);
     }
 
+    /**
+     * Set the location trigger for the scenario.
+     * @param scenario The selected scenario.
+     * @param latitude The latitude of the geofence's center
+     * @param longitude The longitude of the geofence's center
+     * @param radius The geofence's radius
+     */
     public void setScenarioFence(Scenario scenario, double latitude, double longitude, int radius) {
         Log.i(LOG_TAG, "Changing scenario " + scenario + " location: lat=" + latitude
                 + ", lng=" + longitude + "(r=" + radius + ")");
@@ -157,6 +197,11 @@ public class Scenarios {
                 .commit();
     }
 
+    /**
+     * Returns the center of the scenario's geofence.
+     * @param scenario The selected scenario.
+     * @return The center location of the geofence.
+     */
     public Location getScenarioLocation(Scenario scenario) {
         String locationSetName = String.format(SCENARIO_LOCATION_SET_FORMAT, scenario);
         String latName = String.format(SCENARIO_LAT_FORMAT, scenario);
@@ -173,6 +218,11 @@ public class Scenarios {
         return location;
     }
 
+    /**
+     * Return the radius of the geofence corresponding to the scenario.
+     * @param scenario The selected scenario.
+     * @return The radius of the geofence.
+     */
     public int getScenarioRadius(Scenario scenario) {
         String locationSetName = String.format(SCENARIO_LOCATION_SET_FORMAT, scenario);
         String radiusName = String.format(SCENARIO_RADIUS_FORMAT, scenario);

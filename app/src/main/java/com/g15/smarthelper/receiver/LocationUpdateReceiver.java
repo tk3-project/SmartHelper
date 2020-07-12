@@ -20,6 +20,12 @@ import java.util.List;
 
 import static com.g15.smarthelper.Scenarios.SHARED_PREFERENCES_KEY;
 
+
+/**
+ * The {@link Location} is a {@link BroadcastReceiver} that handles updates of the
+ * location api. New location data is locally broadcasted and checked for matching
+ * scenario conditions.
+ */
 public class LocationUpdateReceiver extends BroadcastReceiver {
     private static final String LOG_TAG = "LocationUpdateReceiver";
 
@@ -44,6 +50,11 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
         }
     }
 
+    /**
+     * Broadcast a newly obtained location update.
+     * @param location The location to broadcast.
+     * @param context The context to use for the broadcast.
+     */
     private void broadcastLocation(Location location, Context context) {
         Intent intent = new Intent(Constants.BROADCAST_DETECTED_LOCATION);
         intent.putExtra("latitude", location.getLatitude());
@@ -52,6 +63,12 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
         Log.i(LOG_TAG, "Locally broadcast location update: " + location);
     }
 
+    /**
+     * Process the location update and trigger the scenarios if the conditions match.
+     * @param context The context of the app.
+     * @param scenarios The scenario utility to access the scenario states.
+     * @param location The updated location value.
+     */
     private void processLocationUpdate(Context context, Scenarios scenarios, Location location) {
         Log.d(LOG_TAG, "Processing location updates");
         Scenarios.Scenario[] availableScenarios = Scenarios.Scenario.values();

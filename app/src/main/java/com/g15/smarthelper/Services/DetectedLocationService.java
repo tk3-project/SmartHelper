@@ -5,9 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Build;
 import android.os.HandlerThread;
@@ -30,6 +28,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 
+/**
+ * The {@link DetectedLocationService} handles the activation and deactivation of the location
+ * tracking. The service starts as a foreground service when the app is closed to obtain location
+ * updates in the background.
+ */
 public class DetectedLocationService extends Service {
 
     private static final String LOG_TAG = "DetectedLocationService";
@@ -70,6 +73,9 @@ public class DetectedLocationService extends Service {
         }
     }
 
+    /**
+     * Fetch the latest device location.
+     */
     private void fetchLocation() {
         try {
             Log.v(LOG_TAG, "Fetching latest location.");
@@ -79,6 +85,9 @@ public class DetectedLocationService extends Service {
         }
     }
 
+    /**
+     * Create a location request that determines the QoS of the location updates.
+     */
     private void createLocationRequest() {
         Log.v(LOG_TAG, "Creating location request.");
         locationRequest = new LocationRequest()
@@ -118,6 +127,9 @@ public class DetectedLocationService extends Service {
     }
 
 
+    /**
+     * Start the activity recognition by registering the {@link LocationUpdateReceiver} for receiving location updates.
+     */
     public void startTracking() {
         Log.i(LOG_TAG, "Starting location tracking.");
         startService(new Intent(getApplicationContext(), DetectedLocationService.class));
@@ -149,6 +161,9 @@ public class DetectedLocationService extends Service {
         }
     }
 
+    /**
+     * Stop the activity recognition by unregistering the {@link LocationUpdateReceiver}.
+     */
     public void stopTracking() {
         Log.i(LOG_TAG, "Stopping location tracking.");
         isActive = false;
@@ -175,6 +190,12 @@ public class DetectedLocationService extends Service {
                 });
     }
 
+    /**
+     * Create a fixed notification to allow the creation of a foreground service. The foreground
+     * service is necessary to get reliable location updates in the background.
+     * The created notification is displayed to the user while obtaining location updates.
+     * @return The notification to inform the user about the usage of the location in the background.
+     */
     private Notification createForegroundNotification () {
         Log.v(LOG_TAG, "Creating foreground notification.");
         Intent intent = new Intent(this, MainActivity.class);

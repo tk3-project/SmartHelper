@@ -18,7 +18,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 
-public class DetectedActivitiesService extends Service{
+/**
+ * The {@link DetectedActivitiesService} handles the activation and deactivation of the activity
+ * tracking.
+ */
+public class DetectedActivitiesService extends Service {
 
     private static final String LOG_TAG = "DetectedActivityService";
 
@@ -57,6 +61,9 @@ public class DetectedActivitiesService extends Service{
         return PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
+    /**
+     * Start the activity recognition by registering the {@link ActivityUpdateReceiver} for receiving activity updates.
+     */
     public void startTracking() {
         Log.i(LOG_TAG, "Starting activity tracking.");
 
@@ -83,6 +90,9 @@ public class DetectedActivitiesService extends Service{
                 });
     }
 
+    /**
+     * Stop the activity recognition by unregistering the {@link ActivityUpdateReceiver}.
+     */
     public void stopTracking() {
         Log.i(LOG_TAG, "Stopping activity tracking.");
         mActivityRecognitionClient.removeActivityUpdates(getBroadcastPendingIntent())

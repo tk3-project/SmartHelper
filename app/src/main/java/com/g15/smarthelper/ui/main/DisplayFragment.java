@@ -79,16 +79,26 @@ public class DisplayFragment extends Fragment {
             }
         };
     }
-    private void handleUserLocation(double Lat, double Long){
-        String location = "Lat: " + Lat + "; Long: " + Long;
+
+    /**
+     * Display the location data.
+     * @param lat the latitude of the location.
+     * @param lng the longitude of the location.
+     */
+    private void handleUserLocation(double lat, double lng) {
+        String location = "Lat: " + lat + "; Long: " + lng;
         txtLocation.setText(location);
     }
 
-    private void handleUserActivity(int type) {
+    /**
+     * Display the activity data.
+     * @param activityType The activity type to be displayed.
+     */
+    private void handleUserActivity(int activityType) {
         String label = getString(R.string.activity_unknown);
         int icon = R.drawable.ic_still;
 
-        switch (type) {
+        switch (activityType) {
             case DetectedActivity.IN_VEHICLE: {
                 label = getString(R.string.activity_in_vehicle);
                 icon = R.drawable.ic_driving;

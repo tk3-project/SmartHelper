@@ -11,12 +11,11 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import com.g15.smarthelper.R;
 
 /**
- * A [FragmentPagerAdapter] that returns a fragment corresponding to
- * one of the sections/tabs/pages.
+ * A {@link FragmentPagerAdapter} that returns a fragment corresponding to one of the
+ * sections/tabs/pages.
  */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-    //private String[] mTitles = new String[]{"Settings", "Context"};
     @StringRes
     private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2};
     private final Context mContext;
