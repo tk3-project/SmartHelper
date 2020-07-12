@@ -102,9 +102,8 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
                         new MusicAction(context).sendNotification();
                     else if (scenario == Scenarios.Scenario.SCENARIO_WARNING)
                         new WarningAction(context).sendNotification();
-                    else if (scenario == Scenarios.Scenario.SCENARIO_HOME){
+                    else if (scenario == Scenarios.Scenario.SCENARIO_HOME)
                         new HomeAction(context).sendNotification();
-                    }
                 }
             }
         }

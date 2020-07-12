@@ -20,7 +20,6 @@ import com.g15.smarthelper.R;
 import com.g15.smarthelper.Constants;
 
 import com.g15.smarthelper.ScenarioHandler.HomeAction;
-import com.g15.smarthelper.ScenarioHandler.MusicAction;
 import com.g15.smarthelper.receiver.ActivityUpdateReceiver;
 import com.g15.smarthelper.receiver.LocationUpdateReceiver;
 
@@ -62,13 +61,13 @@ public class DisplayFragment extends Fragment {
         button2.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                new HomeAction(getContext()).DayMode(getContext());
+                new HomeAction(getContext()).dayMode(getContext());
             }
         });
         button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                new HomeAction(getContext()).NightMode(getContext(), getActivity());
+                new HomeAction(getContext()).nightMode(getContext());
             }
         });
 
