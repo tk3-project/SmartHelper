@@ -19,8 +19,16 @@ public class Scenarios {
         SCENARIO_HOME
     }
 
-    private static String LOG_TAG = "scenarios";
-    public static String SHARED_PREFERENCES_KEY = "scenarios-shared-preferences";
+    private static final String LOG_TAG = "scenarios";
+    public static final String SHARED_PREFERENCES_KEY = "scenarios-shared-preferences";
+    private static final String CURRENT_ACTIVITY = "current_activity";
+    private static final String SCENARIO_TRIGGERED_FORMAT = "scenario%1$d_triggered";
+    private static final String SCENARIO_ACTIVATED_FORMAT = "scenario%1$d_activated";
+    private static final String SCENARIO_GEOFENCE_ENTERED_FORMAT = "scenario%1$d_geofence_entered";
+    private static final String SCENARIO_LOCATION_SET_FORMAT = "scenario%1$d_location_set";
+    private static final String SCENARIO_RADIUS_FORMAT = "scenario%1$d_radius";
+    private static final String SCENARIO_LAT_FORMAT = "scenario%1$d_lat";
+    private static final String SCENARIO_LNG_FORMAT = "scenario%1$d_lng";
 
     private SharedPreferences sharedPreferences;
 
@@ -35,7 +43,7 @@ public class Scenarios {
      * @return Returns if the scenario is active.
      */
     public boolean isScenarioActivated(Scenario scenario) {
-        String scenarioName = "scenario" + scenario + "_activated";
+        String scenarioName = String.format(SCENARIO_ACTIVATED_FORMAT, scenario);
         Boolean isActive = sharedPreferences.getBoolean(scenarioName, false);
         Log.d(LOG_TAG, "Scenario " + scenario + (isActive ? " is" : " is not") + " activated.");
         return isActive;
@@ -47,7 +55,7 @@ public class Scenarios {
      */
     public void enableScenario(Scenario scenario) {
         Log.i(LOG_TAG, "Enabling scenario " + scenario);
-        String scenarioName = "scenario" + scenario + "_activated";
+        String scenarioName = String.format(SCENARIO_ACTIVATED_FORMAT, scenario);
         sharedPreferences.edit()
                 .putBoolean(scenarioName, true)
                 .commit();
@@ -59,7 +67,7 @@ public class Scenarios {
      */
     public void disableScenario(Scenario scenario) {
         Log.i(LOG_TAG, "Disabling scenario " + scenario);
-        String scenarioName = "scenario" + scenario + "_activated";
+        String scenarioName = String.format(SCENARIO_ACTIVATED_FORMAT, scenario);
         sharedPreferences.edit()
                 .putBoolean(scenarioName, false)
                 .commit();
@@ -98,59 +106,67 @@ public class Scenarios {
     }
 
     public void setCurrentActivity(int activity) {
+        Log.d(LOG_TAG, "Updating current activity to: " + activity);
         sharedPreferences.edit()
-                .putInt("current_activity", activity)
+                .putInt(CURRENT_ACTIVITY, activity)
                 .commit();
     }
 
     public int getCurrentActivity() {
-        return sharedPreferences.getInt("current_activity", DetectedActivity.UNKNOWN);
+        return sharedPreferences.getInt(CURRENT_ACTIVITY, DetectedActivity.UNKNOWN);
     }
 
     public void setScenarioTriggered(Scenario scenario, boolean triggered) {
-        String scenarioName = "scenario" + scenario + "_triggered";
+        Log.v(LOG_TAG, "Scenario " + scenario + " triggered: " + triggered);
+        String scenarioName = String.format(SCENARIO_TRIGGERED_FORMAT, scenario);
         sharedPreferences.edit()
                 .putBoolean(scenarioName, triggered)
                 .commit();
     }
 
     public boolean getScenarioTriggered(Scenario scenario) {
-        String scenarioName = "scenario" + scenario + "_triggered";
+        String scenarioName = String.format(SCENARIO_TRIGGERED_FORMAT, scenario);
         return sharedPreferences.getBoolean(scenarioName, false);
     }
 
     public void setScenarioGeofenceEntered(Scenario scenario, boolean entered) {
-        String scenarioName = "scenario" + scenario + "_geofence_entered";
+        Log.v(LOG_TAG, "Scenario " + scenario + " geofence entered: " + entered);
+        String scenarioName = String.format(SCENARIO_GEOFENCE_ENTERED_FORMAT, scenario);
         sharedPreferences.edit()
                 .putBoolean(scenarioName, entered)
                 .commit();
     }
 
     public boolean getScenarioGeofenceEntered(Scenario scenario) {
-        String scenarioName = "scenario" + scenario + "_geofence_entered";
+        String scenarioName = String.format(SCENARIO_GEOFENCE_ENTERED_FORMAT, scenario);
         return sharedPreferences.getBoolean(scenarioName, false);
     }
 
     public void setScenarioFence(Scenario scenario, double latitude, double longitude, int radius) {
         Log.i(LOG_TAG, "Changing scenario " + scenario + " location: lat=" + latitude
                 + ", lng=" + longitude + "(r=" + radius + ")");
-        String scenarioName = "scenario" + scenario;
+        String locationSetName = String.format(SCENARIO_LOCATION_SET_FORMAT, scenario);
+        String radiusName = String.format(SCENARIO_RADIUS_FORMAT, scenario);
+        String latName = String.format(SCENARIO_LAT_FORMAT, scenario);
+        String lngName = String.format(SCENARIO_LNG_FORMAT, scenario);
         sharedPreferences.edit()
-                .putLong(scenarioName + "_lat", Double.doubleToRawLongBits(latitude))
-                .putLong(scenarioName + "_lng", Double.doubleToRawLongBits(longitude))
-                .putInt(scenarioName + "_radius", radius)
-                .putBoolean(scenarioName + "_location_set", true)
+                .putLong(latName, Double.doubleToRawLongBits(latitude))
+                .putLong(lngName, Double.doubleToRawLongBits(longitude))
+                .putInt(radiusName, radius)
+                .putBoolean(locationSetName, true)
                 .commit();
     }
 
     public Location getScenarioLocation(Scenario scenario) {
-        String scenarioName = "scenario" + scenario;
-        boolean locationSet = sharedPreferences.getBoolean(scenarioName + "_location_set", false);
+        String locationSetName = String.format(SCENARIO_LOCATION_SET_FORMAT, scenario);
+        String latName = String.format(SCENARIO_LAT_FORMAT, scenario);
+        String lngName = String.format(SCENARIO_LNG_FORMAT, scenario);
+        boolean locationSet = sharedPreferences.getBoolean(locationSetName, false);
         if (!locationSet) {
             return null;
         }
-        double latitude = Double.longBitsToDouble(sharedPreferences.getLong(scenarioName + "_lat", 0));
-        double longitude = Double.longBitsToDouble(sharedPreferences.getLong(scenarioName + "_lng", 0));
+        double latitude = Double.longBitsToDouble(sharedPreferences.getLong(latName, 0));
+        double longitude = Double.longBitsToDouble(sharedPreferences.getLong(lngName, 0));
         Location location = new Location("");
         location.setLatitude(latitude);
         location.setLongitude(longitude);
@@ -158,12 +174,13 @@ public class Scenarios {
     }
 
     public int getScenarioRadius(Scenario scenario) {
-        String scenarioName = "scenario" + scenario;
-        boolean locationSet = sharedPreferences.getBoolean(scenarioName + "_location_set", false);
+        String locationSetName = String.format(SCENARIO_LOCATION_SET_FORMAT, scenario);
+        String radiusName = String.format(SCENARIO_RADIUS_FORMAT, scenario);
+        boolean locationSet = sharedPreferences.getBoolean(locationSetName, false);
         if (!locationSet) {
             return -1;
         } else {
-            return sharedPreferences.getInt(scenarioName + "_radius", 0);
+            return sharedPreferences.getInt(radiusName, 0);
         }
     }
 

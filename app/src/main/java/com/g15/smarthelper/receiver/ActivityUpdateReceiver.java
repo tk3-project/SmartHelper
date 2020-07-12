@@ -27,7 +27,7 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent != null && ActivityRecognitionResult.hasResult(intent)) {
-            Log.e(LOG_TAG, "Received an activity update intent.");
+            Log.i(LOG_TAG, "Received an activity update intent.");
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
             if (result != null) {
                 ArrayList<DetectedActivity> detectedActivities = (ArrayList) result.getProbableActivities();
@@ -58,7 +58,7 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
         Intent intent = new Intent(Constants.BROADCAST_DETECTED_ACTIVITY);
         intent.putExtra("type", activity.getType());
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-        Log.i(LOG_TAG, "activity update already sent");
+        Log.i(LOG_TAG, "Locally broadcast activity update: " + activity);
     }
 
     private void processActivityUpdate(Context context, Scenarios scenarios, int activityType) {

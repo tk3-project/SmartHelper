@@ -30,6 +30,7 @@ public class WarningAction extends ContextWrapper {
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.v(LOG_TAG, "Creating notification channel for warning scenario action.");
             CharSequence name = getString(R.string.app_name);
             String description = getString(R.string.description);
 
@@ -59,6 +60,6 @@ public class WarningAction extends ContextWrapper {
                 .build();
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(notificationId++, notification);
-        Log.i(LOG_TAG, "Notification is sent.");
+        Log.i(LOG_TAG, "Warning action notification is sent.");
     }
 }

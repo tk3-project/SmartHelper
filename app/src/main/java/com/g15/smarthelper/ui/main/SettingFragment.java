@@ -84,6 +84,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
     }
 
     private void setInitialLocation() {
+        Log.v(LOG_TAG, "Initializing scenario locations.");
         double herrnGartenLat = 49.8775;
         double herrnGartenLng = 8.6525;
         int herrnGartenRadius = 150; // in meters

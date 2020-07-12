@@ -26,7 +26,7 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent != null && LocationResult.hasResult(intent)) {
-            Log.e(LOG_TAG, "Received a location update intent.");
+            Log.i(LOG_TAG, "Received a location update intent.");
             LocationResult result = LocationResult.extractResult(intent);
             if (result != null) {
                 List<Location> locations = result.getLocations();
@@ -47,9 +47,9 @@ public class LocationUpdateReceiver extends BroadcastReceiver {
     private void broadcastLocation(Location location, Context context) {
         Intent intent = new Intent(Constants.BROADCAST_DETECTED_LOCATION);
         intent.putExtra("latitude", location.getLatitude());
-        intent.putExtra("longtitude", location.getLongitude());
+        intent.putExtra("longitude", location.getLongitude());
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-        Log.i(LOG_TAG, "Location update already sent");
+        Log.i(LOG_TAG, "Locally broadcast location update: " + location);
     }
 
     private void processLocationUpdate(Context context, Scenarios scenarios, Location location) {

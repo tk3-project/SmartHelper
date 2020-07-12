@@ -35,7 +35,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         } else {
             return new SettingFragment();
         }
-        // return Fragment1.newInstance(position + 1);
     }
 
     @Override

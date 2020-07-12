@@ -1,6 +1,5 @@
 package com.g15.smarthelper.ui.main;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -34,7 +33,6 @@ public class DisplayFragment extends Fragment {
 
     private TextView txtActivity, txtLocation;
     private ImageView imgActivity;
-    private String default_loc, default_act;
 
     @Override
     public View onCreateView(
@@ -47,15 +45,15 @@ public class DisplayFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        default_loc = getString(R.string.location_unknown);
-        default_act = getString(R.string.activity_unknown);
+        String defaultLocation = getString(R.string.location_unknown);
+        String defaultActivity = getString(R.string.activity_unknown);
 
         txtActivity = getActivity().findViewById(R.id.txt_activity);
         txtLocation = getActivity().findViewById(R.id.txt_location);
         imgActivity = getActivity().findViewById(R.id.img_activity);
 
-        txtLocation.setText("Location: " + default_loc);
-        txtActivity.setText("Activity: " + default_act);
+        txtLocation.setText("Location: " + defaultLocation);
+        txtActivity.setText("Activity: " + defaultActivity);
     }
 
     @Override
@@ -75,9 +73,9 @@ public class DisplayFragment extends Fragment {
             @Override
             public void onReceive(Context context, Intent intent) {
                 double latitude = intent.getDoubleExtra("latitude", 0);
-                double longtitude = intent.getDoubleExtra("longtitude", 0);
-                Log.i(LOG_TAG, "Broadcast: Location received, latitude = " + latitude + "; longtitude = " + longtitude);
-                handleUserLocation(latitude, longtitude);
+                double longitude = intent.getDoubleExtra("longitude", 0);
+                Log.i(LOG_TAG, "Broadcast: Location received, latitude = " + latitude + "; longitude = " + longitude);
+                handleUserLocation(latitude, longitude);
             }
         };
     }
@@ -131,7 +129,7 @@ public class DisplayFragment extends Fragment {
             }
         }
 
-        Log.e(LOG_TAG, "User activity: " + label);
+        Log.i(LOG_TAG, "User activity: " + label);
 
         txtActivity.setText(label);
         imgActivity.setImageResource(icon);

@@ -16,7 +16,6 @@ import com.g15.smarthelper.receiver.ActivityUpdateReceiver;
 import com.google.android.gms.location.ActivityRecognitionClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 
 
 public class DetectedActivitiesService extends Service{
@@ -35,7 +34,7 @@ public class DetectedActivitiesService extends Service{
 
     @Override
     public void onCreate() {
-        Log.i(LOG_TAG, "Activity service created");
+        Log.i(LOG_TAG, "DetectedActivitiesService created.");
 
         mActivityRecognitionClient = new ActivityRecognitionClient(this);
     }
@@ -43,7 +42,7 @@ public class DetectedActivitiesService extends Service{
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        Log.v(LOG_TAG, "Bound to DetectedActivitiesService");
+        Log.v(LOG_TAG, "Bound to DetectedActivitiesService.");
         return actBinder;
     }
 
@@ -65,6 +64,7 @@ public class DetectedActivitiesService extends Service{
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void result) {
+                        Log.d(LOG_TAG, "Successfully started activity tracking.");
                         Toast.makeText(getApplicationContext(),
                                 "Successfully requested activity updates",
                                 Toast.LENGTH_SHORT)
@@ -74,6 +74,7 @@ public class DetectedActivitiesService extends Service{
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        Log.e(LOG_TAG, "Failed to start activity tracking.", e);
                         Toast.makeText(getApplicationContext(),
                                 "Requesting activity updates failed to start",
                                 Toast.LENGTH_SHORT)
@@ -88,6 +89,7 @@ public class DetectedActivitiesService extends Service{
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void result) {
+                        Log.d(LOG_TAG, "Successfully stopped activity tracking.");
                         Toast.makeText(getApplicationContext(),
                                 "Successfully removed activity updates",
                                 Toast.LENGTH_SHORT)
@@ -97,6 +99,7 @@ public class DetectedActivitiesService extends Service{
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        Log.e(LOG_TAG, "Failed to stop activity tracking.", e);
                         Toast.makeText(getApplicationContext(),
                                 "Removing activity updates failed to start",
                                 Toast.LENGTH_SHORT)

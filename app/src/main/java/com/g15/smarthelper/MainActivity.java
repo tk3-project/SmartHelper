@@ -32,9 +32,10 @@ public class MainActivity extends AppCompatActivity {
     private DetectedActivitiesService activitiesService;
     private boolean shouldRefreshLocationService = false;
     private boolean shouldRefreshActivityService = false;
-    protected ServiceConnection serviceConnection = new ServiceConnection() {
+    protected ServiceConnection locationServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
+            Log.d(LOG_TAG, "Location service successfully connected.");
             locationService = ((DetectedLocationService.LocalBinder) binder).getService();
             if (shouldRefreshLocationService) {
                 locationService.startTracking();
@@ -48,9 +49,10 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    protected ServiceConnection serviceConnection2 = new ServiceConnection() {
+    protected ServiceConnection activityServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
+            Log.d(LOG_TAG, "Activity service successfully connected.");
             activitiesService = ((DetectedActivitiesService.LocalBinder) binder).getService();
             if (shouldRefreshActivityService) {
                 activitiesService.startTracking();
@@ -74,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        Log.v(LOG_TAG, "Initialize main activity views.");
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
@@ -94,19 +97,23 @@ public class MainActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
+        Log.v(LOG_TAG, "Binding to location service.");
         bindService(new Intent(this, DetectedLocationService.class),
-                serviceConnection, Context.BIND_AUTO_CREATE);
+                locationServiceConnection, Context.BIND_AUTO_CREATE);
+        Log.v(LOG_TAG, "Binding to activity service.");
         bindService(new Intent(this, DetectedActivitiesService.class),
-                serviceConnection2, Context.BIND_AUTO_CREATE);
+                activityServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onStop() {
         if (locationService != null) {
-            unbindService(serviceConnection);
+            Log.v(LOG_TAG, "Unbinding from location service.");
+            unbindService(locationServiceConnection);
         }
         if (activitiesService != null) {
-            unbindService(serviceConnection2);
+            Log.v(LOG_TAG, "Unbinding from activity service.");
+            unbindService(activityServiceConnection);
         }
         super.onStop();
     }
