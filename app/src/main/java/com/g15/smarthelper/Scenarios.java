@@ -22,13 +22,13 @@ public class Scenarios {
     private static final String LOG_TAG = "scenarios";
     public static final String SHARED_PREFERENCES_KEY = "scenarios-shared-preferences";
     private static final String CURRENT_ACTIVITY = "current_activity";
-    private static final String SCENARIO_TRIGGERED_FORMAT = "scenario%1$d_triggered";
-    private static final String SCENARIO_ACTIVATED_FORMAT = "scenario%1$d_activated";
-    private static final String SCENARIO_GEOFENCE_ENTERED_FORMAT = "scenario%1$d_geofence_entered";
-    private static final String SCENARIO_LOCATION_SET_FORMAT = "scenario%1$d_location_set";
-    private static final String SCENARIO_RADIUS_FORMAT = "scenario%1$d_radius";
-    private static final String SCENARIO_LAT_FORMAT = "scenario%1$d_lat";
-    private static final String SCENARIO_LNG_FORMAT = "scenario%1$d_lng";
+    private static final String SCENARIO_TRIGGERED_FORMAT = "scenario%1$s_triggered";
+    private static final String SCENARIO_ACTIVATED_FORMAT = "scenario%1$s_activated";
+    private static final String SCENARIO_GEOFENCE_ENTERED_FORMAT = "scenario%1$s_geofence_entered";
+    private static final String SCENARIO_LOCATION_SET_FORMAT = "scenario%1$s_location_set";
+    private static final String SCENARIO_RADIUS_FORMAT = "scenario%1$s_radius";
+    private static final String SCENARIO_LAT_FORMAT = "scenario%1$s_lat";
+    private static final String SCENARIO_LNG_FORMAT = "scenario%1$s_lng";
 
     private SharedPreferences sharedPreferences;
 
