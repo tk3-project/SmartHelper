@@ -2,12 +2,15 @@
 
 ## Specification
 
-* use `Broadcasteceiver` to fetch and broadcast the activity and location results.
+* When at least one Assistant is enabled, It will display the detected activity and location in CONTEXT page.
+* When at least one Assistant is enabled, It will automatically tracking your activity and location even when you close the app.
+* Selecting Scenario Locations with the floating button.
+* Using `Broadcasteceiver` to fetch and broadcast the activity and location results.
 
 
 ## ChangeLog
 * display default activity and location information when no results obtained.
-* Remove `IntentService	`, use `Receiver` to fetch and broadcast the activity and location results.
+* Remove `IntentService`, use `Receiver` to fetch and broadcast the activity and location results.
 * Enable background services.
 * Enable display Location in DisplayFragement
 * Add `enableLocationAndActivityTracking` and `disableLocationAndActivityTracking` methods in SettingFragment

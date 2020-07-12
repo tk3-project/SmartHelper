@@ -1,13 +1,11 @@
 package com.g15.smarthelper.ui.main;
 
 import android.Manifest;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.provider.Settings;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,30 +14,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.content.Intent;
+import android.net.Uri;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 
 import com.g15.smarthelper.MainActivity;
 import com.g15.smarthelper.R;
-import com.g15.smarthelper.ScenarioHandler.WarningAction;
 import com.g15.smarthelper.Scenarios;
-import com.g15.smarthelper.Services.DetectedActivitiesService;
-import com.g15.smarthelper.receiver.ActivityUpdateReceiver;
-import com.g15.smarthelper.receiver.LocationUpdateReceiver;
-import com.google.android.gms.location.DetectedActivity;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.g15.smarthelper.Constants;
 import static com.g15.smarthelper.Scenarios.SHARED_PREFERENCES_KEY;
 
 
@@ -129,6 +121,11 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
                 neededPermissions.add(Manifest.permission.ACTIVITY_RECOGNITION);
             }
         }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.System.canWrite(getContext())) {
+                neededPermissions.add(Manifest.permission.WRITE_SETTINGS);
+            }
+        }
 
         return neededPermissions.toArray(new String[neededPermissions.size()]);
     }
@@ -184,7 +181,14 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         if (missingPermissions.size() > 0) {
             String permission = missingPermissions.remove(0);
             Log.d(LOG_TAG, "Requesting missing permission: " + permission);
-            requestPermissions(new String[]{permission}, ++permissionCounter);
+            if (permission == "android.permission.WRITE_SETTINGS") {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS,
+                        Uri.parse("package:" + getContext().getPackageName()));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            } else {
+                requestPermissions(new String[]{permission}, ++permissionCounter);
+            }
         }
     }
 

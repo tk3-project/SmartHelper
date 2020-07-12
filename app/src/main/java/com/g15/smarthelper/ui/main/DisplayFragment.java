@@ -19,6 +19,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.g15.smarthelper.R;
 import com.g15.smarthelper.Constants;
 
+import com.g15.smarthelper.ScenarioHandler.HomeAction;
 import com.g15.smarthelper.ScenarioHandler.MusicAction;
 import com.g15.smarthelper.receiver.ActivityUpdateReceiver;
 import com.g15.smarthelper.receiver.LocationUpdateReceiver;
@@ -35,6 +36,8 @@ public class DisplayFragment extends Fragment {
     private TextView txtActivity, txtLocation;
     private ImageView imgActivity;
 
+    private TextView button, button2;
+
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
@@ -48,13 +51,30 @@ public class DisplayFragment extends Fragment {
 
         String defaultLocation = getString(R.string.location_unknown);
         String defaultActivity = getString(R.string.activity_unknown);
+        int defaultIcon = R.drawable.ic_unknown;
 
         txtActivity = getActivity().findViewById(R.id.txt_activity);
         txtLocation = getActivity().findViewById(R.id.txt_location);
         imgActivity = getActivity().findViewById(R.id.img_activity);
 
+        button = getActivity().findViewById(R.id.button);
+        button2 = getActivity().findViewById(R.id.button2);
+        button2.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                new HomeAction(getContext()).DayMode(getContext());
+            }
+        });
+        button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                new HomeAction(getContext()).NightMode(getContext(), getActivity());
+            }
+        });
+
         txtLocation.setText("Location: " + defaultLocation);
         txtActivity.setText("Activity: " + defaultActivity);
+        imgActivity.setImageResource(defaultIcon);
     }
 
     @Override
@@ -97,7 +117,7 @@ public class DisplayFragment extends Fragment {
      */
     private void handleUserActivity(int activityType) {
         String label = getString(R.string.activity_unknown);
-        int icon = R.drawable.ic_still;
+        int icon = R.drawable.ic_unknown;
 
         switch (activityType) {
             case DetectedActivity.IN_VEHICLE: {
