@@ -102,9 +102,6 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         double warningLng = 8.6463;
         int warningRadius = 50; // in meters
         scenarios.setScenarioFence(Scenarios.Scenario.SCENARIO_WARNING, warningLat, warningLng, warningRadius);
-
-        Log.d(LOG_TAG,"initialize the activity state: RUNNING");
-        scenarios.setCurrentActivity(DetectedActivity.RUNNING);
     }
 
     /**
