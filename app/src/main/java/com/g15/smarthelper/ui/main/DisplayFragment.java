@@ -35,8 +35,6 @@ public class DisplayFragment extends Fragment {
     private TextView txtActivity, txtLocation;
     private ImageView imgActivity;
 
-    private TextView button, button2;
-
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
@@ -55,21 +53,6 @@ public class DisplayFragment extends Fragment {
         txtActivity = getActivity().findViewById(R.id.txt_activity);
         txtLocation = getActivity().findViewById(R.id.txt_location);
         imgActivity = getActivity().findViewById(R.id.img_activity);
-
-        button = getActivity().findViewById(R.id.button);
-        button2 = getActivity().findViewById(R.id.button2);
-        button2.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                new HomeAction(getContext()).dayMode(getContext());
-            }
-        });
-        button.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                new HomeAction(getContext()).nightMode(getContext());
-            }
-        });
 
         txtLocation.setText("Location: " + defaultLocation);
         txtActivity.setText("Activity: " + defaultActivity);
@@ -141,6 +124,7 @@ public class DisplayFragment extends Fragment {
             }
             case DetectedActivity.STILL: {
                 label = getString(R.string.activity_still);
+                icon = R.drawable.ic_still;
                 break;
             }
             case DetectedActivity.TILTING: {
