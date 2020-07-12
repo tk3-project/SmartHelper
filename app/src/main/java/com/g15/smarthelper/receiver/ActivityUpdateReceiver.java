@@ -11,6 +11,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.g15.smarthelper.Constants;
 import com.g15.smarthelper.ScenarioHandler.HomeAction;
+import com.g15.smarthelper.ScenarioHandler.MusicAction;
 import com.g15.smarthelper.ScenarioHandler.WarningAction;
 import com.g15.smarthelper.Scenarios;
 import com.google.android.gms.location.ActivityRecognitionResult;
@@ -95,7 +96,7 @@ public class ActivityUpdateReceiver extends BroadcastReceiver {
                     scenarios.setScenarioTriggered(scenario, true);
                     // Trigger scenario handler
                     if (scenario == Scenarios.Scenario.SCENARIO_MUSIC)
-                        new WarningAction(context).sendNotification();
+                        new MusicAction(context).sendNotification();
                     else if (scenario == Scenarios.Scenario.SCENARIO_WARNING)
                         new WarningAction(context).sendNotification();
                     else if (scenario == Scenarios.Scenario.SCENARIO_HOME)

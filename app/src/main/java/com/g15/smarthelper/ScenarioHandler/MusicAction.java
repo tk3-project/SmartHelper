@@ -7,7 +7,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
+import android.net.Uri;
 
 import android.util.Log;
 
@@ -29,7 +31,6 @@ public class MusicAction extends ContextWrapper {
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Log.v(LOG_TAG, "Creating notification channel for music scenario action.");
             CharSequence name = getString(R.string.app_name);
             String description = getString(R.string.description);
 
@@ -43,8 +44,7 @@ public class MusicAction extends ContextWrapper {
 
     public void sendNotification() {
         createNotificationChannel();
-
-        Intent intent = new Intent("android.intent.action.MUSIC_PLAYER");
+        Intent intent = openMusicApp();
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
@@ -59,6 +59,27 @@ public class MusicAction extends ContextWrapper {
                 .build();
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(notificationId++, notification);
-        Log.i(LOG_TAG, "Music action notification is sent.");
+        Log.i(LOG_TAG, "Notification is sent.");
+    }
+
+    public Intent openMusicApp() {
+        Intent launchIntent;
+
+        try {
+            getPackageManager().getPackageInfo("com.spotify.music", 0);
+            launchIntent = new Intent(Intent.ACTION_VIEW);
+            launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            launchIntent.setData(Uri.parse("spotify:playlist:4cgeOaRCHDkVDQPaDrRQFR:play"));
+            launchIntent.putExtra(Intent.EXTRA_REFERRER,
+                    Uri.parse("android-app://" + this.getPackageName()));
+            Log.i(LOG_TAG, "Spotify opened.");
+
+        } catch (PackageManager.NameNotFoundException e) {
+            launchIntent = new Intent("android.intent.action.MUSIC_PLAYER");
+            launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Log.i(LOG_TAG, "Please open other music players.");
+        }
+        startActivity(launchIntent);
+        return launchIntent;
     }
 }
