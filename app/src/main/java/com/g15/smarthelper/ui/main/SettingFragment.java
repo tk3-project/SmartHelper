@@ -121,13 +121,19 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
                 neededPermissions.add(Manifest.permission.ACTIVITY_RECOGNITION);
             }
         }
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.System.canWrite(getContext())) {
-                neededPermissions.add(Manifest.permission.WRITE_SETTINGS);
-            }
-        }
 
         return neededPermissions.toArray(new String[neededPermissions.size()]);
+    }
+
+    private void requestSettingsAccess() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.System.canWrite(getContext())) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS,
+                        Uri.parse("package:" + getContext().getPackageName()));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        }
     }
 
     /**
@@ -181,14 +187,7 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
         if (missingPermissions.size() > 0) {
             String permission = missingPermissions.remove(0);
             Log.d(LOG_TAG, "Requesting missing permission: " + permission);
-            if (permission == "android.permission.WRITE_SETTINGS") {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS,
-                        Uri.parse("package:" + getContext().getPackageName()));
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            } else {
-                requestPermissions(new String[]{permission}, ++permissionCounter);
-            }
+            requestPermissions(new String[]{permission}, ++permissionCounter);
         }
     }
 
@@ -208,6 +207,8 @@ public class SettingFragment extends Fragment implements CompoundButton.OnChecke
             Log.d(LOG_TAG, "Requesting missing permission: " + permission);
             requestPermissions(new String[]{permission}, ++permissionCounter);
         } else {
+            Log.i(LOG_TAG, "Requesting settings access.");
+            requestSettingsAccess();
             Log.i(LOG_TAG, "All needed permissions granted.");
             if (currentTargetScenario != null) {
                 Log.i(LOG_TAG, "Activating pending scenario.");

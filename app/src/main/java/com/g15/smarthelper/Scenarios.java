@@ -109,7 +109,7 @@ public class Scenarios {
         switch (scenario) {
             case SCENARIO_HOME: return DetectedActivity.STILL;
             case SCENARIO_MUSIC: return DetectedActivity.RUNNING;
-            case SCENARIO_WARNING: return DetectedActivity.STILL;
+            case SCENARIO_WARNING: return DetectedActivity.WALKING;
         }
         return DetectedActivity.UNKNOWN;
     }

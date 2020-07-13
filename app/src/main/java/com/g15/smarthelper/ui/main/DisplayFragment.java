@@ -20,7 +20,6 @@ import com.g15.smarthelper.R;
 import com.g15.smarthelper.Constants;
 
 import com.g15.smarthelper.ScenarioHandler.HomeAction;
-import com.g15.smarthelper.ScenarioHandler.MusicAction;
 import com.g15.smarthelper.receiver.ActivityUpdateReceiver;
 import com.g15.smarthelper.receiver.LocationUpdateReceiver;
 
@@ -35,8 +34,6 @@ public class DisplayFragment extends Fragment {
 
     private TextView txtActivity, txtLocation;
     private ImageView imgActivity;
-
-    private TextView button, button2;
 
     @Override
     public View onCreateView(
@@ -56,21 +53,6 @@ public class DisplayFragment extends Fragment {
         txtActivity = getActivity().findViewById(R.id.txt_activity);
         txtLocation = getActivity().findViewById(R.id.txt_location);
         imgActivity = getActivity().findViewById(R.id.img_activity);
-
-        button = getActivity().findViewById(R.id.button);
-        button2 = getActivity().findViewById(R.id.button2);
-        button2.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                new HomeAction(getContext()).DayMode(getContext());
-            }
-        });
-        button.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                new HomeAction(getContext()).NightMode(getContext(), getActivity());
-            }
-        });
 
         txtLocation.setText("Location: " + defaultLocation);
         txtActivity.setText("Activity: " + defaultActivity);
@@ -142,6 +124,7 @@ public class DisplayFragment extends Fragment {
             }
             case DetectedActivity.STILL: {
                 label = getString(R.string.activity_still);
+                icon = R.drawable.ic_still;
                 break;
             }
             case DetectedActivity.TILTING: {

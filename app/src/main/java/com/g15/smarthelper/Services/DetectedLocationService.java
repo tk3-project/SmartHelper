@@ -93,7 +93,7 @@ public class DetectedLocationService extends Service {
         locationRequest = new LocationRequest()
                 .setInterval(Constants.UPDATE_INTERVAL)
                 .setFastestInterval(Constants.FASTEST_UPDATE_INTERVAL)
-                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY)
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setMaxWaitTime(Constants.MAX_WAIT_TIME);
     }
 
